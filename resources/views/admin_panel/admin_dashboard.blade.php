@@ -52,7 +52,7 @@
                                 class="widget-two__btn btn btn-outline--success">View All</a>
                         </div>
 
-                    </div><!-- dashboard-w1 end -->
+                    </div>
 
                     <div class="col-xxl-3 col-sm-6">
                         <div class="widget-two box--shadow2 b-radius--5 bg--white">
@@ -71,7 +71,7 @@
                                 class="widget-two__btn btn btn-outline--danger">View All</a>
                         </div>
 
-                    </div><!-- dashboard-w1 end -->
+                    </div>
 
                     <div class="col-xxl-3 col-sm-6">
                         <div class="widget-two box--shadow2 b-radius--5 bg--white">
@@ -90,7 +90,7 @@
                                 class="widget-two__btn btn btn-outline--primary">View All</a>
                         </div>
 
-                    </div><!-- dashboard-w1 end -->
+                    </div>
 
                     
 
@@ -100,7 +100,7 @@
 
 
 
-                <div class="row gy-4 mb-30">
+                <!-- <div class="row gy-4 mb-30">
                     <div class="col-xl-6">
                         <div class="d-flex justify-content-between align-items-center flex-wrap mb-3">
                             <h5>Product Alert Items </h5>
@@ -142,7 +142,7 @@
                                             @endforeach
 
                                         </tbody>
-                                    </table><!-- table end -->
+                                    </table>
                                 </div>
                             </div>
                         </div>
@@ -174,13 +174,13 @@
                                             </tr>
                                             @endforeach
                                         </tbody>
-                                    </table><!-- table end -->
+                                    </table>
                                 </div>
                             </div>
                         </div>
                     </div>
 
-                </div>
+                </div> -->
 
                 <div class="row gy-4">
                     <div class="col-xxl-3 col-sm-6">
@@ -196,7 +196,7 @@
                             <a href="https://script.viserlab.com/torylab/admin/category" class="widget-two__btn">View
                                 All</a>
                         </div>
-                    </div><!-- dashboard-w1 end -->
+                    </div>
                     <div class="col-xxl-3 col-sm-6">
                         <div class="widget-two style--two box--shadow2 b-radius--5 bg--primary">
                             <div class="widget-two__icon b-radius--5 bg--primary">
@@ -210,7 +210,7 @@
                             <a href="https://script.viserlab.com/torylab/admin/product/all" class="widget-two__btn">View
                                 All</a>
                         </div>
-                    </div><!-- dashboard-w1 end -->
+                    </div>
 
                     <div class="col-xxl-3 col-sm-6">
                         <div class="widget-two style--two box--shadow2 b-radius--5 bg--18">
@@ -225,7 +225,7 @@
                             <a href="https://script.viserlab.com/torylab/admin/supplier/all"
                                 class="widget-two__btn">View All</a>
                         </div>
-                    </div><!-- dashboard-w1 end -->
+                    </div>
 
                     <div class="col-xxl-3 col-sm-6">
                         <div class="widget-two style--two box--shadow2 b-radius--5 bg--19">
@@ -240,8 +240,8 @@
                             <a href="https://script.viserlab.com/torylab/admin/customer/all"
                                 class="widget-two__btn">View All</a>
                         </div>
-                    </div><!-- dashboard-w1 end -->
-                </div><!-- row end-->
+                    </div>
+                </div>
 
 
 

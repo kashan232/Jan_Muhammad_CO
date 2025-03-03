@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" dir="ltr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -21,12 +22,18 @@
             justify-content: center;
             padding: 0 20px;
             background: #ddd;
-            background: url('assets/admin/images/background4.jpg');
+            background: url('background3.jpg');
             background-repeat: no-repeat;
             background-size: cover;
             background-position: center;
         }
-
+        body::before {
+            content: '';
+            width: 100%;
+            height: 100%;
+            background: #0000006e;
+            position: absolute;
+        }
         .wrapper {
 
 
@@ -34,7 +41,7 @@
             max-width: 430px;
             width: 100%;
             background: #fff;
-            padding: 60px 34px;
+            padding: 21px 21px;
             border-radius: 6px;
             box-shadow: 0 5px 10px rgba(0, 0, 0, 0.2);
         }
@@ -54,7 +61,7 @@
             height: 3px;
             width: 48px;
             border-radius: 12px;
-            background: #160F54;
+            background: #000;
         }
 
         .wrapper form {
@@ -97,7 +104,7 @@
 
         .input-box input:focus,
         .input-box input:valid {
-            border-color: #160F54;
+            border-color: #000;
         }
 
         form .policy {
@@ -116,12 +123,12 @@
             color: #fff;
             letter-spacing: 1px;
             border: none;
-            background: #160F54;
+            background: #000;
             cursor: pointer;
         }
 
         .input-box.button input:hover {
-            background: #160F54;
+            background: #000;
         }
 
         form .text h3 {
@@ -152,30 +159,37 @@
             background-color: #f8d7da;
             border-color: #f5c6cb;
         }
-    </style> 
+    </style>
     <div class="wrapper">
         <div style="width:100%; text-align:center;">
-            <img src="assets/admin/images/login_logo.png" alt="image">
+            <img src="logo_white.png" alt="image" style="width: 130px; background:#000;border-radius:100px;padding:4px;">
+
         </div>
         <!-- <h2>Admin Login</h2> -->
         <form method="POST" action="{{ route('login') }}">
             @csrf
             @if ($errors->any())
-                    <div class="alert alert-danger">
-                        @foreach ($errors->all() as $error)
-                        <p>{{ $error }}</p>
-                        @endforeach
-                    </div>
-                    @endif
+            <div class="alert alert-danger">
+                @foreach ($errors->all() as $error)
+                <p>{{ $error }}</p>
+                @endforeach
+            </div>
+            @endif
 
             <div class="input-box">
-                <x-input-label for="email"/>
+                <x-input-label for="email" />
                 <x-text-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" placeholder="Email" required autofocus autocomplete="username" />
             </div>
-            <div class="input-box"> 
-                <x-input-label for="password"/>
+            <div class="input-box">
+                <x-input-label for="password" />
                 <x-text-input id="password" class="block mt-1 w-full" type="password" name="password" placeholder="Password" required autocomplete="current-password" />
             </div>
+            <div>
+                <a href="#" class="txt1">
+                    Forgot Password?
+                </a>
+            </div>
+
             <div class="input-box button">
                 <input type="Submit" value="Login">
             </div>
@@ -183,5 +197,6 @@
     </div>
     <script src="https://code.jquery.com/jquery-3.7.0.js" integrity="sha256-JlqSTELeR4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM="
         crossorigin="anonymous"></script>
-</body>
+    </body>
+
 </html>

@@ -3,7 +3,7 @@
     <div class="sidebar__inner">
         <div class="sidebar__logo">
             <a href="#" class="sidebar__main-logo">
-                <img src="{{ asset('assets\images\logo.jpg') }}" alt="image">
+                <img src="{{ asset('logo_white.png') }}" alt="image">
             </a>
         </div>
         <div class="sidebar__menu-wrapper" id="sidebar__menuWrapper">
@@ -16,7 +16,21 @@
                     </a>
                 </li>
 
-                {{-- <li class="sidebar-menu-item sidebar-dropdown">
+                <li class="sidebar-menu-item ">
+                    <a href="{{ route('category') }}" class="nav-link ">
+                        <i class="menu-icon la la-warehouse"></i>
+                        <span class="menu-title">Categories</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item ">
+                    <a href="{{ route('subcategory') }}" class="nav-link ">
+                        <i class="menu-icon la la-warehouse"></i>
+                        <span class="menu-title">Sub Categories</span>
+                    </a>
+                </li>
+
+               <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>
                         <span class="menu-title">Manage Staff</span>
@@ -39,9 +53,9 @@
 
                         </ul>
                     </div>
-                </li> --}}
+                </li>  -->
 
-                <li class="sidebar-menu-item sidebar-dropdown">
+                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="">
                         <i class="menu-icon lab la-product-hunt"></i>
                         <span class="menu-title">Manage Product</span>
@@ -81,15 +95,15 @@
                             </li>
                         </ul>
                     </div>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item ">
+                <!-- <li class="sidebar-menu-item ">
                     <a href="{{ route('all-order') }}" class="nav-link ">
                         <i class="menu-icon la la-warehouse"></i>
                         <span class="menu-title">Order</span>
                     </a>
-                </li>
-                <li class="sidebar-menu-item ">
+                </li> -->
+                <!-- <li class="sidebar-menu-item ">
                     <a href="{{ route('product-alerts') }}" class="nav-link ">
                         <i class="menu-icon las la-bell"></i>
                         <span class="menu-title">Stock Alerts</span>
@@ -104,31 +118,31 @@
                             <small>&nbsp;<i class="fa fa-circle text--danger" aria-hidden="true" aria-label="Returned" data-bs-original-title="Returned"></i></small>
                             @endif --}}
                     </a>
-                </li>
+                </li> -->
 
-                <li class="sidebar-menu-item ">
+                <!-- <li class="sidebar-menu-item ">
                     <a href="{{ route('warehouse') }}" class="nav-link ">
                         <i class="menu-icon la la-warehouse"></i>
                         <span class="menu-title">Warehouse</span>
                     </a>
-                </li>
+                </li> -->
 
 
 
 
-                {{-- <li class="sidebar-menu-item">
+                 <!-- <li class="sidebar-menu-item">
                     <a href="{{ route('supplier') }}" class="nav-link">
                         <i class="menu-icon la la-user-friends"></i>
                         <span class="menu-title">Supplier</span>
                     </a>
-                </li> --}}
-                {{-- <li class="sidebar-menu-item">
+                </li> 
+                 <li class="sidebar-menu-item">
                     <a href="{{ route('supplier') }}" class="nav-link">
                         <i class="menu-icon la la-user-friends"></i>
                         <span class="menu-title">Vendor</span>
                     </a>
-                </li> --}}
-                <li class="sidebar-menu-item">
+                </li>  -->
+                <!-- <li class="sidebar-menu-item">
                     <a href="{{ route('vendor') }}" class="nav-link">
                         <i class="menu-icon la la-user-friends"></i>
                         <span class="menu-title">Vendor</span>
@@ -189,7 +203,7 @@
                     </a>
                 </li>
                 
-                {{-- <li class="sidebar-menu-item sidebar-dropdown">
+                <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="">
                         <i class="menu-icon la la-shopping-cart"></i>
                         <span class="menu-title">Sale</span>
@@ -211,40 +225,14 @@
                             </li>
                         </ul>
                     </div>
-                </li> --}}
+                </li>  -->
             </ul>
             @endif
 
-
-
-            @if(Auth::check() && Auth::user()->usertype == 'staff')
-            <ul class="sidebar__menu">
-                <li class="sidebar-menu-item active">
-                    <a href="{{ route('home') }}" class="nav-link ">
-                        <i class="menu-icon la la-home"></i>
-                        <span class="menu-title">Dashboard</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-menu-item">
-                    <a href="{{ route('all-sales') }}" class="nav-link">
-                        <i class="menu-icon la la-dot-circle"></i>
-                        <span class="menu-title">All Sales</span>
-                    </a>
-                </li>
-
-                <li class="sidebar-menu-item">
-                    <a href="{{ route('customer') }}" class="nav-link">
-                        <i class="menu-icon la la-users"></i>
-                        <span class="menu-title">Customer</span>
-                    </a>
-                </li>
-            </ul>
-            @endif
             <div class="text-center mb-3 text-uppercase">
-                <span class="text--success">SK</span>
-                <span class="text--primary">Parwa</span>
-                <span class="text--success">Software</span>
+                <span class="text--warning">Jan</span>
+                <span class="text--primary">Muhammad</span>
+                <span class="text--warning">CO</span>
             </div>
         </div>
     </div>
