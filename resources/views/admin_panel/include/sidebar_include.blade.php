@@ -44,13 +44,39 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item">
-                    <a href="{{ route('customer') }}" class="nav-link">
-                        <i class="menu-icon la la-users"></i>
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="menu-icon las la-users"></i>
                         <span class="menu-title">Customer</span>
                     </a>
-                </li>
-                
+                    <div class="sidebar-submenu ">
+                        <ul>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('customer') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Customers</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('customer-ledger') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Cutomers Ledger</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="#">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Cutomers Recoveries</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
+                </li>  
+
+
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>

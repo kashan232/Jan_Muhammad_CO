@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Customer;
 use App\Models\CustomerCredit;
+use App\Models\CustomerLedger;
 use App\Models\CustomerRecovery;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -32,18 +33,14 @@ class CustomerController extends Controller
             $userId = Auth::id();
             $customer = Customer::create([
                 'admin_or_user_id' => $userId,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
                 'city' => $request->city,
                 'area' => $request->area,
-                'customer_name' => $request->customer_name,
-                'phone_number' => $request->phone_number,
-                'address' => $request->address,
-                'shop_name' => $request->shop_name,
-                'business_type_name' => $request->business_type_id,
+                'customer_address' => $request->customer_address,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
-
-            // Distributor Ledger Create (One-time Opening Balance)
             CustomerLedger::create([
                 'admin_or_user_id' => $userId,
                 'customer_id' => $customer->id,
@@ -66,16 +63,13 @@ class CustomerController extends Controller
             $userId = Auth::id();
             // dd($request);
             $update_id = $request->input('customer_id');
-            $name = $request->input('customer_name');
-            $email = $request->input('customer_email');
-            $phone = $request->input('customer_phone');
-            $address = $request->input('customer_address');
 
             Customer::where('id', $update_id)->update([
-                'customer_name'          => $name,
-                'customer_email'          => $email,
-                'customer_phone'          => $phone,
-                'customer_address'          => $address,
+                'customer_name' => $request->customer_name,
+                'customer_phone' => $request->customer_phone,
+                'city' => $request->city,
+                'area' => $request->area,
+                'customer_address' => $request->customer_address,
                 'updated_at' => Carbon::now(),
             ]);
             return redirect()->back()->with('success', 'Customer Updated Successfully');
@@ -169,4 +163,16 @@ class CustomerController extends Controller
 
         return redirect()->back()->with('success', 'Credit added successfully to the customer.');
     }
+
+    public function customer_ledger()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+            $CustomerLedgers = CustomerLedger::where('admin_or_user_id', $userId)->with('Customer')->get();
+            return view('admin_panel.customers.customers_ledger', compact('CustomerLedgers'));
+        } else {
+            return redirect()->back();
+        }
+    }
+
 }

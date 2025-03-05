@@ -161,6 +161,9 @@ Route::post('/customer/recovery', [CustomerController::class, 'processRecovery']
 Route::get('/customer-recovires', [CustomerController::class, 'customer_recovires'])->middleware(['auth','admin'])->name('customer-recovires');
 Route::post('/customer/credit', [CustomerController::class, 'addCredit'])->name('customer.credit');
 
+Route::get('/customer-ledger', [CustomerController::class, 'customer_ledger'])->middleware(['auth', 'admin'])->name('customer-ledger');
+
+
 //Vendors
 Route::get('/vendor', [VendorController::class, 'vendor'])->name('vendor');
 Route::post('/store-vendor', [VendorController::class, 'store_vendor'])->name('store-vendor');

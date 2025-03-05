@@ -41,13 +41,13 @@
                         <div class="card b-radius--10">
                             <div class="card-body p-0">
                                 <div class="table-responsive--sm table-responsive">
-                                    <table class="table--light style--two table">
+                                    <table id="example" class="display  table table--light" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>S.N.</th>
                                                 <th>Name</th>
-                                                <th>Unique Identity</th>
-                                                <th>Phone | Email</th>
+                                                <th>Phone</th>
+                                                <th>City | Area</th>
                                                 <th>Address</th>
                                                 <th>Action</th>
                                             </tr>
@@ -56,29 +56,17 @@
                                             @foreach($Customers as $Customer)
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $Customer->name }}</td>
-                                                <td>{{ $Customer->identity }}</td>
-                                                <td>{{ $Customer->phone }}<br>{{ $Customer->email }}</td>
-                                                <td>{{ $Customer->address }}</td>
-                                                {{-- <td><strong>{{ $Customer->closing_balance ?? '0' }}</strong></td> <!-- Display the closing balance --> --}}
+                                                <td>{{ $Customer->customer_name }}</td>
+                                                <td>{{ $Customer->customer_phone }}</td>
+                                                <td>{{ $Customer->city }}<br>{{ $Customer->area }}</td>
+                                                <td>{{ $Customer->customer_address }}</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editcustomerbtn" data-toggle="modal" data-target="#exampleModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}" data-customer-email="{{ $Customer->customer_email }}" data-customer-phone="{{ $Customer->customer_phone }}"
-                                                            data-customer-address="{{ $Customer->address }}">
+                                                        <button type="button" class="btn btn-sm btn-outline--primary editcustomerbtn" data-toggle="modal" data-target="#exampleModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}"
+                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}"
+                                                            data-customer-address="{{ $Customer->customer_address }}">
                                                             <i class="la la-pencil"></i>Edit </button>
-
-                                                        {{-- <button type="button" class="btn btn-sm btn-outline--danger customerRecoveryBtn" data-toggle="modal" data-target="#customerRecoveryModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}" data-closing-balance="{{ $Customer->closing_balance }}">
-                                                            <i class="las la-money-bill"></i>Recovery
-                                                        </button> --}}
-{{-- 
-                                                        <button type="button" class="btn btn-sm btn-outline--info customerCreditBtn" data-toggle="modal" data-target="#customerCreditModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}">
-                                                            <i class="las la-credit-card"></i>Credit
-                                                        </button> --}}
-
                                                     </div>
-
-
-
                                                 </td>
                                             </tr>
                                             @endforeach
@@ -125,7 +113,7 @@
                                     </div>
                                     <div class="form-group">
                                         <label>Opening Balance</label>
-                                        <input type="text" class="form-control" name="customer_address">
+                                        <input type="text" class="form-control" name="opening_balance">
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -151,15 +139,20 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="hidden" name="customer_id" id="customer_id">
-                                        <input type="text" class="form-control" name="customer_name" id="edit_customer_name">
+                                        <input type="text" class="form-control" id="edit_customer_name" name="customer_name" required>
                                     </div>
-                                    <div class="form-group">
-                                        <label>Email</label>
-                                        <input type="text" class="form-control" name="customer_email" id="edit_customer_email">
-                                    </div>
+
                                     <div class="form-group">
                                         <label>Mobile</label>
-                                        <input type="text" class="form-control" name="customer_phone" id="edit_customer_phone">
+                                        <input type="text" class="form-control" id="edit_customer_phone" name="customer_phone">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>City</label>
+                                        <input type="text" class="form-control" name="city" id="customer_city">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Area</label>
+                                        <input type="text" class="form-control" name="area" id="customer_area">
                                     </div>
                                     <div class="form-group">
                                         <label>Address</label>
@@ -261,15 +254,16 @@
                 // Extract category ID and name from data attributes
                 var customerId = $(this).data('customer-id');
                 var customername = $(this).data('customer-name');
-                var customeremail = $(this).data('customer-email');
                 var customerphone = $(this).data('customer-phone');
                 var customeraddress = $(this).data('customer-address');
-
-                console.log(customerId, customername, customeremail, customerphone, customeraddress);
+                var customercity = $(this).data('customer-city');
+                var customerarea = $(this).data('customer-area');
+                console.log(customerId, customername, customercity, customerarea, customerphone, customeraddress);
 
                 $('#customer_id').val(customerId);
                 $('#edit_customer_name').val(customername);
-                $('#edit_customer_email').val(customeremail);
+                $('#customer_city').val(customercity);
+                $('#customer_area').val(customerarea);
                 $('#edit_customer_phone').val(customerphone);
                 $('#edit_customer_address').val(customeraddress);
 
@@ -314,3 +308,4 @@
             });
         });
     </script>
+    
