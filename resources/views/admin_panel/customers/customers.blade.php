@@ -108,15 +108,23 @@
                                         <input type="text" class="form-control" name="customer_name" required>
                                     </div>
                                     <div class="form-group">
-                                        <label>Email</label>
-                                        <input type="text" class="form-control" name="customer_email">
-                                    </div>
-                                    <div class="form-group">
                                         <label>Mobile</label>
                                         <input type="text" class="form-control" name="customer_phone">
                                     </div>
                                     <div class="form-group">
+                                        <label>City</label>
+                                        <input type="text" class="form-control" name="city">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Area</label>
+                                        <input type="text" class="form-control" name="area">
+                                    </div>
+                                    <div class="form-group">
                                         <label>Address</label>
+                                        <input type="text" class="form-control" name="customer_address">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Opening Balance</label>
                                         <input type="text" class="form-control" name="customer_address">
                                     </div>
                                 </div>

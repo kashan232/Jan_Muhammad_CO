@@ -13,13 +13,8 @@ return new class extends Migration
     {
         Schema::create('orders', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('customer_id');
-            $table->decimal('total_amount');
-            $table->decimal('paid_amount');
-            $table->decimal('due_amount');
-            $table->string('status')->default('pending');
-            $table->date('order_date');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

@@ -27,25 +27,37 @@ class CustomerController extends Controller
 
     public function store_customer(Request $request)
     {
-        // dd($request->toArray());
-        $lastCustomer = Customer::latest('id')->first(); // Last customer ka ID find karega
-        $nextId = $lastCustomer ? $lastCustomer->id + 1 : 1; // Agar koi customer nahi mila toh 1 set karega
-        
-        // dd('CUST-' . str_pad($nextId, 4, '0', STR_PAD_LEFT));
+
         if (Auth::id()) {
-            $usertype = Auth()->user()->usertype;
             $userId = Auth::id();
-            Customer::create([
-                'name'          => $request->customer_name,
-                'email'          => $request->customer_email,
-                'phone'          => $request->customer_phone,
-                'address'          => $request->customer_address,
-                'identity'          => 'CUST-' . str_pad($nextId, 4, '0', STR_PAD_LEFT),
+            $customer = Customer::create([
+                'admin_or_user_id' => $userId,
+                'city' => $request->city,
+                'area' => $request->area,
+                'customer_name' => $request->customer_name,
+                'phone_number' => $request->phone_number,
+                'address' => $request->address,
+                'shop_name' => $request->shop_name,
+                'business_type_name' => $request->business_type_id,
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
-            return redirect()->back()->with('success', 'Customer has been  created successfully');
+
+            // Distributor Ledger Create (One-time Opening Balance)
+            CustomerLedger::create([
+                'admin_or_user_id' => $userId,
+                'customer_id' => $customer->id,
+                'previous_balance' => $request->opening_balance, // Pehli dafa opening balance = previous balance
+                'closing_balance' => $request->opening_balance, // Closing balance bhi initially same hoga
+                'created_at' => Carbon::now(),
+            ]);
+
+            return redirect()->back()->with('success', 'Customer created successfully');
         } else {
             return redirect()->back();
         }
+
+        
     }
     public function update_customer(Request $request)
     {

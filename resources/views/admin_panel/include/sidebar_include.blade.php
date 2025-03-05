@@ -23,13 +23,34 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item ">
+                <!-- <li class="sidebar-menu-item ">
                     <a href="{{ route('subcategory') }}" class="nav-link ">
                         <i class="menu-icon la la-warehouse"></i>
                         <span class="menu-title">Sub Categories</span>
                     </a>
+                </li> -->
+
+                <li class="sidebar-menu-item ">
+                    <a href="{{ route('brand') }}" class="nav-link ">
+                        <i class="menu-icon la la-warehouse"></i>
+                        <span class="menu-title">Verity </span>
+                    </a>
                 </li>
 
+                <li class="sidebar-menu-item ">
+                    <a href="{{ route('unit') }}" class="nav-link ">
+                        <i class="menu-icon la la-warehouse"></i>
+                        <span class="menu-title">Units</span>
+                    </a>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('customer') }}" class="nav-link">
+                        <i class="menu-icon la la-users"></i>
+                        <span class="menu-title">Customer</span>
+                    </a>
+                </li>
+                
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>
