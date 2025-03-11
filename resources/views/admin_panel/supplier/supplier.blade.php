@@ -17,9 +17,9 @@
             <div class="bodywrapper__inner">
 
                 <div class="d-flex mb-30 flex-wrap gap-3 justify-content-between align-items-center">
-                    <h6 class="page-title">All Suppliers</h6>
+                    <h6 class="page-title">Vendors</h6>
                     <div class="d-flex flex-wrap justify-content-end gap-2 align-items-center breadcrumb-plugins">
-                        <button type="button" class="btn btn-outline--primary cuModalBtn" data-modal_title="Add New Supplier">
+                        <button type="button" class="btn btn-outline--primary cuModalBtn" data-modal_title="Add New Vendors">
                             <i class="la la-plus"></i>Add New </button>
                     </div>
                 </div>
@@ -57,7 +57,7 @@
                                                 <td>0</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-email="{{ $Supplier->email }}" data-supplier-mobile="{{ $Supplier->mobile }}" data-supplier-company="{{ $Supplier->company_name }}" data-supplier-address="{{ $Supplier->address }}">
+                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}"data-city="{{ $Supplier->city }}"data-area="{{ $Supplier->area }}"  data-supplier-address="{{ $Supplier->address }}">
                                                             <i class="la la-pencil"></i>Edit </button>
 
                                                         <a href="#" class="btn btn-sm btn-outline--info">
@@ -95,13 +95,6 @@
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label class="form-label">E-Mail</label>
-                                                <input type="email" class="form-control" name="email">
-                                            </div>
-                                        </div>
-
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
                                                 <label class="form-label">Mobile <i class="fa fa-info-circle text--primary" title="Type the mobile number including the country code. Otherwise, SMS won't send to that number.">
                                                     </i>
                                                 </label>
@@ -110,11 +103,16 @@
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label>Company</label>
-                                                <input type="text" name="company_name" class="form-control" autocomplete="off" value="">
+                                                <label>City</label>
+                                                <input type="text" name="city" class="form-control" autocomplete="off" value="">
                                             </div>
                                         </div>
-
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Area</label>
+                                                <input type="text" name="area" class="form-control" autocomplete="off" value="">
+                                            </div>
+                                        </div>
                                         <div class="col-lg-12">
                                             <div class="form-group">
                                                 <label>Address</label>
@@ -137,7 +135,7 @@
                     <div class="modal-dialog modal-lg">
                         <div class="modal-content">
                             <div class="modal-header">
-                                <h5 class="modal-title" id="exampleModalLabel">Edit Supplier</h5>
+                                <h5 class="modal-title" id="exampleModalLabel">Edit Vendor</h5>
                                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                                     <span aria-hidden="true">&times;</span>
                                 </button>
@@ -153,12 +151,6 @@
                                                 <input type="text" name="name" id="suplier_name" class="form-control" autocomplete="off">
                                             </div>
                                         </div>
-                                        <div class="col-lg-6">
-                                            <div class="form-group">
-                                                <label class="form-label">E-Mail</label>
-                                                <input type="email" class="form-control" id="suplier_email" name="email">
-                                            </div>
-                                        </div>
 
                                         <div class="col-lg-6">
                                             <div class="form-group">
@@ -170,8 +162,14 @@
                                         </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label>Company</label>
-                                                <input type="text" name="company_name" id="suplier_company" class="form-control" autocomplete="off">
+                                                <label>City</label>
+                                                <input type="text" name="city" id="sup_city" class="form-control" autocomplete="off" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Area</label>
+                                                <input type="text" name="area" id="sup_area" class="form-control" autocomplete="off" value="">
                                             </div>
                                         </div>
 
@@ -204,17 +202,15 @@
                 // Extract category ID and name from data attributes
                 var supplierId = $(this).data('supplier-id');
                 var suppliername = $(this).data('supplier-name');
-                var supplieremail = $(this).data('supplier-email');
                 var suppliermobile = $(this).data('supplier-mobile');
-                var suppliercompany = $(this).data('supplier-company');
+                var suppliercity= $(this).data('city');
+                var supplierarea = $(this).data('area');
                 var supplieraddress = $(this).data('supplier-address');
-
-
                 $('#supplier_id').val(supplierId);
                 $('#suplier_name').val(suppliername);
-                $('#suplier_email').val(supplieremail);
                 $('#suplier_mobile').val(suppliermobile);
-                $('#suplier_company').val(suppliercompany);
+                $('#sup_city').val(suppliercity);
+                $('#sup_area').val(supplierarea);
                 $('#suplier_address').val(supplieraddress);
             });
         });

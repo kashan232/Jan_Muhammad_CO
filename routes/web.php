@@ -15,6 +15,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\TruckEntryController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
@@ -168,6 +169,13 @@ Route::get('/customer-ledger', [CustomerController::class, 'customer_ledger'])->
 Route::get('/vendor', [VendorController::class, 'vendor'])->name('vendor');
 Route::post('/store-vendor', [VendorController::class, 'store_vendor'])->name('store-vendor');
 Route::post('/update-vendor', [VendorController::class, 'update_vendor'])->name('update-vendor');
+
+
+Route::get('/Truck-Entry', [TruckEntryController::class, 'Truck_Entry'])->name('Truck-Entry');
+Route::post('/Truck-Entry/Store', [TruckEntryController::class, 'store'])->name('Truck-Entry.Store');
+Route::get('/Truck-Entries', [TruckEntryController::class, 'Truck_Enters'])->name('Truck-Entries');
+Route::get('/Truck-Entry/{id}', [TruckEntryController::class, 'show'])->name('Truck-Entry.Show');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

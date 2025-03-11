@@ -31,9 +31,9 @@ class SupplierController extends Controller
             Supplier::create([
                 'admin_or_user_id'    => $userId,
                 'name'          => $request->name,
-                'email'          => $request->email,
                 'mobile'          => $request->mobile,
-                'company_name'          => $request->company_name,
+                'city'          => $request->city,
+                'area'          => $request->area,
                 'address'          => $request->address,
                 'created_at'        => Carbon::now(),
                 'updated_at'        => Carbon::now(),
@@ -51,17 +51,17 @@ class SupplierController extends Controller
             // dd($request);
             $update_id = $request->input('supplier_id');
             $name = $request->input('name');
-            $email = $request->input('email');
             $mobile = $request->input('mobile');
-            $company_name = $request->input('company_name');
+            $city = $request->input('city');
+            $area = $request->input('area');
             $address = $request->input('address');
 
             Supplier::where('id', $update_id)->update([
                 'admin_or_user_id'    => $userId,
                 'name'          => $name,
-                'email'          => $email,
                 'mobile'          => $mobile,
-                'company_name'    => $company_name,
+                'city'          => $city,
+                'area'          => $area,
                 'address'          => $address,
                 'updated_at' => Carbon::now(),
             ]);
