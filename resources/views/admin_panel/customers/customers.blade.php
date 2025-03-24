@@ -48,7 +48,6 @@
                                                 <th>Name</th>
                                                 <th>Phone</th>
                                                 <th>City | Area</th>
-                                                <th>Address</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -59,12 +58,10 @@
                                                 <td>{{ $Customer->customer_name }}</td>
                                                 <td>{{ $Customer->customer_phone }}</td>
                                                 <td>{{ $Customer->city }}<br>{{ $Customer->area }}</td>
-                                                <td>{{ $Customer->customer_address }}</td>
                                                 <td>
                                                     <div class="button--group">
                                                         <button type="button" class="btn btn-sm btn-outline--primary editcustomerbtn" data-toggle="modal" data-target="#exampleModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}"
-                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}"
-                                                            data-customer-address="{{ $Customer->customer_address }}">
+                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}">
                                                             <i class="la la-pencil"></i>Edit </button>
                                                     </div>
                                                 </td>
@@ -106,10 +103,6 @@
                                     <div class="form-group">
                                         <label>Area</label>
                                         <input type="text" class="form-control" name="area">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Address</label>
-                                        <input type="text" class="form-control" name="customer_address">
                                     </div>
                                     <div class="form-group">
                                         <label>Opening Balance</label>
@@ -154,10 +147,6 @@
                                         <label>Area</label>
                                         <input type="text" class="form-control" name="area" id="customer_area">
                                     </div>
-                                    <div class="form-group">
-                                        <label>Address</label>
-                                        <input type="text" class="form-control" id="edit_customer_address" name="customer_address">
-                                    </div>
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn--primary w-100 h-45">Update</button>
@@ -166,82 +155,6 @@
                         </div>
                     </div>
                 </div>
-
-                <div class="modal fade" id="customerRecoveryModal" tabindex="-1" aria-labelledby="customerRecoveryModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="customerRecoveryModalLabel">Customer Recovery Details</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <form id="customerRecoveryForm" action="{{ route('customer.recovery') }}" method="POST">
-                                @csrf
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label>Customer Name</label>
-                                        <input type="text" class="form-control" id="recovery_customer_name" readonly>
-                                        <input type="hidden" name="customer_id" id="recovery_customer_id">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Closing Balance</label>
-                                        <input type="text" class="form-control" id="recovery_closing_balance" readonly>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Recovery Date</label>
-                                        <input type="date" class="form-control" name="recovery_date" id="recovery_date" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Recovery Amount</label>
-                                        <input type="number" class="form-control" name="recovery_amount" id="recovery_amount" required>
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Updated Closing Balance</label>
-                                        <input type="text" class="form-control" id="updated_closing_balance" readonly>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn--primary w-100 h-45">Submit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="modal fade" id="customerCreditModal" tabindex="-1" aria-labelledby="customerCreditModalLabel" aria-hidden="true">
-                    <div class="modal-dialog">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title" id="customerCreditModalLabel">Add Credit for Customer</h5>
-                                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                    <span aria-hidden="true">&times;</span>
-                                </button>
-                            </div>
-                            <form id="customerCreditForm" action="{{ route('customer.credit') }}" method="POST">
-                                @csrf
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <label>Customer Name</label>
-                                        <input type="text" class="form-control" id="credit_customer_name" name="customer_name" readonly>
-                                        <input type="hidden" name="customer_id" id="credit_customer_id">
-                                    </div>
-                                    <div class="form-group">
-                                        <label>Credit Amount</label>
-                                        <input type="number" class="form-control" name="credit_amount" id="credit_amount" required min="0">
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="submit" class="btn btn--primary w-100 h-45">Add Credit</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-
-
-
             </div><!-- bodywrapper__inner end -->
         </div><!-- body-wrapper end -->
     </div>
@@ -267,44 +180,6 @@
                 $('#edit_customer_phone').val(customerphone);
                 $('#edit_customer_address').val(customeraddress);
 
-            });
-        });
-
-        $(document).ready(function() {
-            $('.customerRecoveryBtn').click(function() {
-                var customerId = $(this).data('customer-id');
-                var customerName = $(this).data('customer-name');
-                var closingBalance = parseFloat($(this).data('closing-balance'));
-
-                $('#recovery_customer_id').val(customerId);
-                $('#recovery_customer_name').val(customerName);
-                $('#recovery_closing_balance').val(closingBalance);
-                $('#updated_closing_balance').val(closingBalance); // Set initial updated balance
-
-                // Clear previous inputs
-                $('#recovery_amount').val('');
-                $('#recovery_date').val('');
-            });
-
-            // Calculate updated closing balance on recovery amount change
-            $('#recovery_amount').on('input', function() {
-                var closingBalance = parseFloat($('#recovery_closing_balance').val());
-                var recoveryAmount = parseFloat($(this).val()) || 0;
-                var updatedBalance = closingBalance - recoveryAmount;
-
-                $('#updated_closing_balance').val(updatedBalance);
-            });
-        });
-
-        $(document).ready(function() {
-            $('.customerCreditBtn').click(function() {
-                var customerId = $(this).data('customer-id');
-                var customerName = $(this).data('customer-name');
-
-                $('#credit_customer_id').val(customerId);
-                $('#credit_customer_name').val(customerName);
-
-                $('#credit_amount').val(''); // Clear previous input
             });
         });
     </script>

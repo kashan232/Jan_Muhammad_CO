@@ -33,8 +33,8 @@
                                 <input type="number" class="form-control" id="amount_paid" name="amount_paid" required>
                             </div>
                             <div class="mb-3">
-                                <label for="salesman" class="form-label">Salesman</label>
-                                <input type="text" class="form-control" id="salesman" name="salesman" required>
+                                <label for="description" class="form-label">Description</label>
+                                <input type="text" class="form-control" id="description" name="description" required>
                             </div>
                             <div class="mb-3">
                                 <label for="date" class="form-label">Date</label>
@@ -106,7 +106,7 @@
     @include('admin_panel.include.footer_include')
     
 <script>
-    document.addEventListener("DOMContentLoaded", function() {
+   document.addEventListener("DOMContentLoaded", function() {
         var recoveryModal = document.getElementById('recoveryModal');
         recoveryModal.addEventListener('show.bs.modal', function (event) {
             var button = event.relatedTarget;
@@ -121,7 +121,7 @@
             event.preventDefault();
 
             var formData = new FormData(this);
-            fetch("", {
+            fetch("{{ route('customer-recovery-store') }}", {
                 method: "POST",
                 headers: {
                     "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value

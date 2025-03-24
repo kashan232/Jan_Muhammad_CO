@@ -57,7 +57,7 @@
                                                 <td>0</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}"data-city="{{ $Supplier->city }}"data-area="{{ $Supplier->area }}"  data-supplier-address="{{ $Supplier->address }}">
+                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}"data-city="{{ $Supplier->city }}"data-area="{{ $Supplier->area }}">
                                                             <i class="la la-pencil"></i>Edit </button>
 
                                                         <a href="#" class="btn btn-sm btn-outline--info">
@@ -111,12 +111,6 @@
                                             <div class="form-group">
                                                 <label>Area</label>
                                                 <input type="text" name="area" class="form-control" autocomplete="off" value="">
-                                            </div>
-                                        </div>
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label>Address</label>
-                                                <input type="text" name="address" class="form-control" value="">
                                             </div>
                                         </div>
                                     </div>
@@ -173,12 +167,7 @@
                                             </div>
                                         </div>
 
-                                        <div class="col-lg-12">
-                                            <div class="form-group">
-                                                <label>Address</label>
-                                                <input type="text" name="address" id="suplier_address" class="form-control">
-                                            </div>
-                                        </div>
+                                        
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -205,13 +194,11 @@
                 var suppliermobile = $(this).data('supplier-mobile');
                 var suppliercity= $(this).data('city');
                 var supplierarea = $(this).data('area');
-                var supplieraddress = $(this).data('supplier-address');
                 $('#supplier_id').val(supplierId);
                 $('#suplier_name').val(suppliername);
                 $('#suplier_mobile').val(suppliermobile);
                 $('#sup_city').val(suppliercity);
                 $('#sup_area').val(supplierarea);
-                $('#suplier_address').val(supplieraddress);
             });
         });
     </script>

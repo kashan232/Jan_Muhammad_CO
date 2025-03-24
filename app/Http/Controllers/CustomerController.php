@@ -78,61 +78,6 @@ class CustomerController extends Controller
         }
     }
 
-    public function processRecovery(Request $request)
-    {
-        $request->validate([
-            'customer_id' => 'required|exists:customers,id',
-            'recovery_date' => 'required|date',
-            'recovery_amount' => 'required|numeric|min:0',
-        ]);
-
-        $customer_id = $request->customer_id;
-
-        // Fetch the customer record (use first() to get a single record)
-        $customer = CustomerCredit::where('customerId', $customer_id)->first();
-
-        // Check if the customer record exists
-        if (!$customer) {
-            return redirect()->back()->withErrors(['customer_id' => 'Customer credit record not found!']);
-        }
-
-        // Calculate new balances
-        $recoveryAmount = $request->recovery_amount;
-        $updatedClosingBalance = $customer->closing_balance - $recoveryAmount;
-
-        // Store recovery details in the CustomerRecovery table
-        CustomerRecovery::create([
-            'customer_id' => $customer->customerId, // Use customerId instead of id for CustomerCredit
-            'customer_name' => $customer->customer_name,
-            'recovery_date' => $request->recovery_date,
-            'recovery_amount' => $recoveryAmount,
-            'closing_balance' => $updatedClosingBalance,
-        ]);
-
-        // Update customer's balance in the CustomerCredit table
-        $customer->previous_balance -= $recoveryAmount;
-        $customer->closing_balance = $updatedClosingBalance;
-        $customer->save();
-
-        return redirect()->back()->with('success', 'Customer recovery details saved successfully!');
-    }
-
-    public function customer_recovires()
-    {
-        if (Auth::id()) {
-            $userId = Auth::id();
-            // dd($userId);
-            // Fetch customers along with their closing balance from customer_credits
-            $Customers = CustomerRecovery::get();
-
-            return view('admin_panel.customers.customers_recoveries', [
-                'Customers' => $Customers
-            ]);
-        } else {
-            return redirect()->back();
-        }
-    }
-
     public function addCredit(Request $request)
     {
         $request->validate([
@@ -175,4 +120,38 @@ class CustomerController extends Controller
         }
     }
 
+    public function customer_recovery_store(Request $request)
+    {
+        $ledger = CustomerLedger::find($request->ledger_id);
+        $ledger->previous_balance -= $request->amount_paid;
+        $ledger->closing_balance -= $request->amount_paid;
+        $ledger->save();
+
+        $userId = Auth::id();
+
+        // Store recovery record (Optional)
+        CustomerRecovery::create([
+            'admin_or_user_id' => $userId,
+            'customer_ledger_id' => $ledger->id,
+            'amount_paid' => $request->amount_paid,
+            'description' => $request->description,
+            'date' => $request->date,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'new_closing_balance' => number_format($ledger->closing_balance, 0)
+        ]);
+    }
+
+    public function customer_recovery()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+            $Recoveries = CustomerRecovery::where('admin_or_user_id', $userId)->with('customer')->get();
+            return view('admin_panel.customers.customers_recoveries', compact('Recoveries'));
+        } else {
+            return redirect()->back();
+        }
+    }
 }

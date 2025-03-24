@@ -8,6 +8,7 @@ use App\Models\LotEntry;
 use App\Models\Supplier;
 use App\Models\TruckEntry;
 use App\Models\Unit;
+use App\Models\UnitIn;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -24,12 +25,14 @@ class TruckEntryController extends Controller
             $categories = Category::get();
             $varieties = Brand::get();
             $Units = Unit::get();
+            $UnitIns = UnitIn::get();
 
             return view('admin_panel.Truck_entry.truck_entry', [
                 'vendors' => $vendors,
                 'categories' => $categories,
                 'varieties' => $varieties,
-                'Units' => $Units
+                'Units' => $Units,
+                'UnitIns' => $UnitIns
             ]);
         } else {
             return redirect()->back();
@@ -71,6 +74,7 @@ class TruckEntryController extends Controller
                 'unit' => $request->unit[$key],
                 'unit_in' => $request->unit_in[$key],
                 'lot_quantity' => $request->lot_quantity[$key],
+                'total_units' => $request->lot_quantity[$key],
             ]);
         }
         return redirect()->back()->with('success', 'Truck Entry Added Successfully');

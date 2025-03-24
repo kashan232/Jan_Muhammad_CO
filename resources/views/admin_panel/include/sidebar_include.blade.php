@@ -16,33 +16,45 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item ">
-                    <a href="{{ route('category') }}" class="nav-link ">
-                        <i class="menu-icon la la-warehouse"></i>
-                        <span class="menu-title">Categories</span>
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="menu-icon fas fa-truck"></i>
+                        <span class="menu-title">Products</span>
                     </a>
+                    <div class="sidebar-submenu ">
+                        <ul>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('category') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Products </span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('brand') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Verity</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('unit') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Units</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('In-unit') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Units In</span>
+                                </a>
+                            </li>
+
+                        </ul>
+                    </div>
                 </li>
 
-                <!-- <li class="sidebar-menu-item ">
-                    <a href="{{ route('subcategory') }}" class="nav-link ">
-                        <i class="menu-icon la la-warehouse"></i>
-                        <span class="menu-title">Sub Categories</span>
-                    </a>
-                </li> -->
-
-                <li class="sidebar-menu-item ">
-                    <a href="{{ route('brand') }}" class="nav-link ">
-                        <i class="menu-icon la la-warehouse"></i>
-                        <span class="menu-title">Verity </span>
-                    </a>
-                </li>
-
-                <li class="sidebar-menu-item ">
-                    <a href="{{ route('unit') }}" class="nav-link ">
-                        <i class="menu-icon la la-warehouse"></i>
-                        <span class="menu-title">Units</span>
-                    </a>
-                </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a  href="javascript:void(0)">
@@ -66,7 +78,7 @@
                             </li>
 
                             <li class="sidebar-menu-item ">
-                                <a class="nav-link" href="#">
+                                <a class="nav-link" href="{{ route('customer-recovery') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">Cutomers Recoveries</span>
                                 </a>
@@ -100,6 +112,29 @@
                                 <a class="nav-link" href="{{ route('Truck-Entries') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">Trucks Enter</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>
+
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="menu-icon fas fa-truck"></i>
+                        <span class="menu-title"> Sale</span>
+                    </a>
+                    <div class="sidebar-submenu ">
+                        <ul>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('show-trucks') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> sale </span>
+                                </a>
+                            </li>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('customer-sale') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> Customer sale </span>
                                 </a>
                             </li>
                         </ul>
@@ -267,12 +302,6 @@
                     </a>
                 </li>
 
-                <li class="sidebar-menu-item">
-                    <a href="{{ route('customer-recovires') }}" class="nav-link">
-                        <i class="menu-icon la la-users"></i>
-                        <span class="menu-title">Customer Recoveries</span>
-                    </a>
-                </li>
                 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a href="javascript:void(0)" class="">

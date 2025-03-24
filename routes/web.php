@@ -5,6 +5,7 @@ use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\Sub_cat_Cotnroller;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\LotSaleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
@@ -16,6 +17,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\TruckEntryController;
+use App\Http\Controllers\UnitInController;
 use App\Http\Controllers\VendorController;
 use Illuminate\Support\Facades\Route;
 
@@ -73,6 +75,13 @@ Route::post('/update-brand', [BrandController::class, 'update_brand'])->name('up
 Route::get('/unit', [UnitController::class, 'unit'])->middleware(['auth','admin'])->name('unit');
 Route::post('/store-unit', [UnitController::class, 'store_unit'])->name('store-unit');
 Route::post('/update-unit', [UnitController::class, 'update_unit'])->name('update-unit');
+
+
+//unit
+Route::get('/In-unit', [UnitInController::class, 'In_unit'])->middleware(['auth','admin'])->name('In-unit');
+Route::post('/store-In-unit', [UnitInController::class, 'store_In_unit'])->name('store-In-unit');
+Route::post('/update-In-unit', [UnitInController::class, 'update_In_unit'])->name('update-In-unit');
+
 
 //product
 Route::get('/all-product', [ProductController::class, 'all_product'])->middleware(['auth','admin'])->name('all-product');
@@ -158,11 +167,10 @@ Route::get('/sale-receipt/{id}', [SaleController::class, 'showReceipt'])->name('
 Route::get('/customer', [CustomerController::class, 'customer'])->name('customer');
 Route::post('/store-customer', [CustomerController::class, 'store_customer'])->name('store-customer');
 Route::post('/update-customer', [CustomerController::class, 'update_customer'])->name('update-customer');
-Route::post('/customer/recovery', [CustomerController::class, 'processRecovery'])->name('customer.recovery');
-Route::get('/customer-recovires', [CustomerController::class, 'customer_recovires'])->middleware(['auth','admin'])->name('customer-recovires');
-Route::post('/customer/credit', [CustomerController::class, 'addCredit'])->name('customer.credit');
 
 Route::get('/customer-ledger', [CustomerController::class, 'customer_ledger'])->middleware(['auth', 'admin'])->name('customer-ledger');
+Route::post('/customer-recovery-store', [CustomerController::class, 'customer_recovery_store'])->name('customer-recovery-store');
+Route::get('/customer-recovery', [CustomerController::class, 'customer_recovery'])->middleware(['auth', 'admin'])->name('customer-recovery');
 
 
 //Vendors
@@ -176,6 +184,12 @@ Route::post('/Truck-Entry/Store', [TruckEntryController::class, 'store'])->name(
 Route::get('/Truck-Entries', [TruckEntryController::class, 'Truck_Enters'])->name('Truck-Entries');
 Route::get('/Truck-Entry/{id}', [TruckEntryController::class, 'show'])->name('Truck-Entry.Show');
 
+Route::get('/show-trucks', [LotSaleController::class, 'show_trucks'])->name('show-trucks');
+Route::get('/show-Lots/{id}', [LotSaleController::class, 'show_Lots'])->name('show-Lots');
+Route::post('/lot-sale', [LotSaleController::class, 'store_lot'])->name('lot.sale.store');
+
+Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
+Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

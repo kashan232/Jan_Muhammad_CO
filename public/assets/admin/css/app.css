@@ -1715,7 +1715,7 @@ a {
 /* color css start */
 .text--primary {
     /* color: #000 !important; */
-    color: #767676 !important;
+    color: #e0ac10 !important;
 }
 
 .text--secondary {
@@ -3788,7 +3788,7 @@ a {
 
 .btn-outline--primary {
     /* color: #000; */
-    color: #767676;
+    color: #e0ac10;
     /* border-color: #000; */
     border-color: #3b2a1a;
 }
@@ -5638,7 +5638,7 @@ th.w-85 {
 
 .sidebar .slimScrollDiv .slimScrollBar {
     /* background-color: #000 !important; */
-    background-color: #767676 !important;
+    background-color: #e0ac10 !important;
     width: 5px !important;
     opacity: 1 !important;
 }
@@ -5893,7 +5893,7 @@ th.w-85 {
 
 .sidebar__menu .sidebar-submenu .sidebar-menu-item.active>a {
     /* background-color: #00059 !important; */
-    background-color: #767676 !important;
+    background-color: #e0ac10 !important;
 }
 
 .sidebar__menu .sidebar-submenu .sidebar-menu-item.active a .menu-icon {
@@ -5952,7 +5952,7 @@ th.w-85 {
 
 .sidebar[class*="bg--"] .sidebar__menu .sidebar-menu-item .side-menu--open {
     /* background-color: #000 !important; */
-    background-color: #767676 !important;
+    background-color: #e0ac10 !important;
 }
 
 .sidebar[class*="bg--"] .sidebar__menu .sidebar-dropdown>a::before {
@@ -7460,7 +7460,7 @@ th.w-85 {
 
 .dark-version table.table--light thead th {
     background-color: #262c49 !important;
-    /* background-color: #767676 !important; */
+    /* background-color: #e0ac10 !important; */
 }
 
 .dark-version .bg--white {

@@ -28,23 +28,29 @@
                                     <table class="table--light style--two table">
                                         <thead>
                                             <tr>
-                                                <th>S.N.</th>
-                                                <th>Name</th>
+                                                <th>#</th>
+                                                <th>Customer</th>
+                                                <th>Description</th>
+                                                <th>Amount Paid</th>
                                                 <th>Date</th>
-                                                <th>Recovery Amount</th>
-                                                <th>Closing Balance</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            @foreach($Customers as $Customer)
+                                            @foreach($Recoveries as $key => $recovery)
                                             <tr>
-                                                <td>{{ $loop->iteration }}</td>
-                                                <td>{{ $Customer->customer_name }}</td>
-                                                <td>{{ $Customer->recovery_date }}</td>
-                                                <td>{{ $Customer->recovery_amount }}</td>
-                                                <td>{{ $Customer->closing_balance }}</td>
+                                                <td>{{ $key + 1 }}</td>
+                                                <td>{{ $recovery->customer->customer_name ?? 'N/A' }}</td>
+                                                <td>{{ $recovery->description }}</td>
+                                                <td>{{ number_format($recovery->amount_paid, 0) }}</td>
+                                                <td>{{ $recovery->date }}</td>
+
                                             </tr>
                                             @endforeach
+                                            @if($Recoveries->isEmpty())
+                                            <tr>
+                                                <td colspan="7" class="text-center">No recoveries found.</td>
+                                            </tr>
+                                            @endif
                                         </tbody>
                                     </table>
                                 </div>

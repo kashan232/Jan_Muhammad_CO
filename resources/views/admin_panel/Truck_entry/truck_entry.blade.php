@@ -67,60 +67,62 @@
 
                             <!-- LOT ENTRY TABLE -->
                             <h5>Lot Details</h5>
-                            <table class="table table-bordered" id="lotTable">
-                                <thead>
-                                    <tr>
-                                        <th>Category</th>
-                                        <th>Variety</th>
-                                        <th>Size</th>
-                                        <th>Unit In</th>
-                                        <th>Lot Quantity</th>
-                                        <th>Action</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <select name="category[]" class="form-control">
-                                                <option value="">Select Category</option>
-                                                @foreach($categories as $category)
-                                                <option value="{{ $category->category }}">{{ $category->category }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="variety[]" class="form-control">
-                                                <option value="">Select Variety</option>
-                                                @foreach($varieties as $variety)
-                                                <option value="{{ $variety->brand }}">{{ $variety->brand }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="unit[]" class="form-control">
-                                                <option value="">Select Unit</option>
-                                                @foreach($Units as $Unit)
-                                                <option value="{{ $Unit->unit }}">{{ $Unit->unit }}</option>
-                                                @endforeach
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <select name="unit_in[]" class="form-control">
-                                                <option value="" disabled>Select Unit In</option>
-                                                <option value="Bori">Bori</option>
-                                                <option value="Katta">Katta</option>
-                                                <option value="Jali">Jali</option>
-                                            </select>
-                                        </td>
-                                        <td>
-                                            <input type="number" name="lot_quantity[]" class="form-control">
-                                        </td>
-                                        <td>
-                                            <button type="button" class="btn btn-danger remove-row"><i class="fas fa-trash"></i></button>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="lotTable">
+                                    <thead>
+                                        <tr>
+                                            <th>Category</th>
+                                            <th>Variety</th>
+                                            <th>Size</th>
+                                            <th>Unit In</th>
+                                            <th>Lot Quantity</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td >
+                                                <select name="category[]" class="form-control" style="width: 150px;">
+                                                    <option value="">Select Category</option>
+                                                    @foreach($categories as $category)
+                                                    <option value="{{ $category->category }}">{{ $category->category }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="variety[]" class="form-control" style="width: 150px;">
+                                                    <option value="">Select Variety</option>
+                                                    @foreach($varieties as $variety)
+                                                    <option value="{{ $variety->brand }}">{{ $variety->brand }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="unit[]" class="form-control" style="width: 150px;">
+                                                    <option value="">Select Unit</option>
+                                                    @foreach($Units as $Unit)
+                                                    <option value="{{ $Unit->unit }}">{{ $Unit->unit }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select name="unit_in[]" class="form-control" style="width: 150px;">
+                                                    <option value="" disabled>Select Unit In</option>
+                                                    @foreach($UnitIns as $Unitin)
+                                                    <option value="{{ $Unitin->unit_in }}">{{ $Unitin->unit_in }}</option>
+                                                    @endforeach
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <input type="number" name="lot_quantity[]" class="form-control" style="width: 150px;">
+                                            </td>
+                                            <td>
+                                                <button type="button" class="btn btn-danger remove-row"><i class="fas fa-trash"></i></button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
 
                             <button type="button" class="btn btn-primary mt-2 mb-2" id="addMore">+ Add More Lot</button>
 
