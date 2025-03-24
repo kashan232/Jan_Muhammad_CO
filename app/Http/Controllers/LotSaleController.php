@@ -82,13 +82,22 @@ class LotSaleController extends Controller
             $previousBalance = $customerLedger ? $customerLedger->closing_balance : 0;
             $closingBalance = $previousBalance + $subTotal;
 
-            CustomerLedger::create([
-                'admin_or_user_id' => auth()->id(),
-                'customer_id' => $customerId,
-                'previous_balance' => $previousBalance,
-                'closing_balance' => $closingBalance,
-            ]);
+            if ($customerLedger) {
+                // Agar ledger pehle se hai, toh update karo
+                $customerLedger->update([
+                    'closing_balance' => $closingBalance,
+                ]);
+            } else {
+                // Agar ledger nahi hai, toh create karo
+                CustomerLedger::create([
+                    'admin_or_user_id' => auth()->id(),
+                    'customer_id' => $customerId,
+                    'previous_balance' => $previousBalance,
+                    'closing_balance' => $closingBalance,
+                ]);
+            }
         }
+
 
         return response()->json(['success' => true, 'message' => 'Sale recorded successfully']);
     }

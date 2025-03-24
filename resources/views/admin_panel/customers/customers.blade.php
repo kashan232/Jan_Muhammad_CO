@@ -48,6 +48,7 @@
                                                 <th>Name</th>
                                                 <th>Phone</th>
                                                 <th>City | Area</th>
+                                                <th>Opening Balance</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -58,10 +59,11 @@
                                                 <td>{{ $Customer->customer_name }}</td>
                                                 <td>{{ $Customer->customer_phone }}</td>
                                                 <td>{{ $Customer->city }}<br>{{ $Customer->area }}</td>
+                                                <td>{{ $Customer->opening_balance }}</td>
                                                 <td>
                                                     <div class="button--group">
                                                         <button type="button" class="btn btn-sm btn-outline--primary editcustomerbtn" data-toggle="modal" data-target="#exampleModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}"
-                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}">
+                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}" data-opening-balance="{{ $Customer->opening_balance }}">
                                                             <i class="la la-pencil"></i>Edit </button>
                                                     </div>
                                                 </td>
@@ -147,6 +149,12 @@
                                         <label>Area</label>
                                         <input type="text" class="form-control" name="area" id="customer_area">
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Opening Balance</label>
+                                        <input type="text" class="form-control" name="opening_balance" id="edit_opening_balance">
+                                    </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn--primary w-100 h-45">Update</button>
@@ -171,7 +179,7 @@
                 var customeraddress = $(this).data('customer-address');
                 var customercity = $(this).data('customer-city');
                 var customerarea = $(this).data('customer-area');
-                console.log(customerId, customername, customercity, customerarea, customerphone, customeraddress);
+                var customeropeningbalance = $(this).data('opening-balance');
 
                 $('#customer_id').val(customerId);
                 $('#edit_customer_name').val(customername);
@@ -179,6 +187,7 @@
                 $('#customer_area').val(customerarea);
                 $('#edit_customer_phone').val(customerphone);
                 $('#edit_customer_address').val(customeraddress);
+                $('#edit_opening_balance').val(customeropeningbalance);
 
             });
         });

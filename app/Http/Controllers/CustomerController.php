@@ -38,6 +38,7 @@ class CustomerController extends Controller
                 'city' => $request->city,
                 'area' => $request->area,
                 'customer_address' => $request->customer_address,
+                'opening_balance' => $request->opening_balance,
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
@@ -70,6 +71,7 @@ class CustomerController extends Controller
                 'city' => $request->city,
                 'area' => $request->area,
                 'customer_address' => $request->customer_address,
+                'opening_balance' => $request->opening_balance,
                 'updated_at' => Carbon::now(),
             ]);
             return redirect()->back()->with('success', 'Customer Updated Successfully');

@@ -6,6 +6,42 @@
         @include('admin_panel.include.sidebar_include')
         @include('admin_panel.include.navbar_include')
 
+        <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="addCustomerModalLabel">Add Customer</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form id="addCustomerForm">
+                        @csrf
+                        <div class="modal-body">
+                            <div class="form-group">
+                                <label>Name</label>
+                                <input type="text" class="form-control" name="customer_name" required>
+                            </div>
+                            <div class="form-group">
+                                <label>Mobile</label>
+                                <input type="text" class="form-control" name="customer_phone">
+                            </div>
+                            <div class="form-group">
+                                <label>City</label>
+                                <input type="text" class="form-control" name="city">
+                            </div>
+                            <div class="form-group">
+                                <label>Area</label>
+                                <input type="text" class="form-control" name="area">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="submit" class="btn btn-primary w-100">Submit</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+
         <div class="body-wrapper">
             <div class="bodywrapper__inner">
                 <div class="d-flex mb-4 flex-wrap gap-3 justify-content-between align-items-center">
@@ -26,14 +62,19 @@
                                 </div>
                                 <div class="col-md-4 mb-3" id="customer_select" style="display: none;">
                                     <label for="customer" class="form-label">Select Customer</label>
-                                    <select class="form-control" id="customer">
-                                        <option value="">Select Customer</option>
-                                        @foreach($customers as $customer)
-                                        <option value="{{ $customer->id }}" data-number="{{ $customer->customer_phone }}">
-                                            {{ $customer->customer_name }}
-                                        </option>
-                                        @endforeach
-                                    </select>
+                                    <div class="d-flex">
+                                        <select class="form-control" id="customer">
+                                            <option value="">Select Customer</option>
+                                            @foreach($customers as $customer)
+                                            <option value="{{ $customer->id }}" data-number="{{ $customer->customer_phone }}">
+                                                {{ $customer->customer_name }}
+                                            </option>
+                                            @endforeach
+                                        </select>
+                                        <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
+                                            <i class="fas fa-plus"></i>
+                                        </button>
+                                    </div>
                                 </div>
                                 <div class="col-md-4 mb-3" id="customer_number_container" style="display: none;">
                                     <label for="customer_number" class="form-label">Customer Number</label>
@@ -115,6 +156,18 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        $(document).ready(function() {
+            $("#addCustomerForm").submit(function(e) {
+                e.preventDefault();
+
+                $.post("{{ route('store-customer') }}", $(this).serialize(), function() {
+                    $("#addCustomerModal").modal("hide");
+                    location.reload(); // Page refresh
+                });
+            });
+        });
+    </script>
+    <script>
         document.getElementById('customer_type').addEventListener('change', function() {
             let type = this.value;
             let customerSelect = document.getElementById('customer_select');
@@ -136,9 +189,25 @@
 
         function addSaleRow(id, category, variety, unit, lotQuantity) {
             let table = document.querySelector("#saleTable tbody");
-            let row = document.createElement("tr");
 
-            row.setAttribute("data-lot-id", id); // Lot ID ko row mein set karein
+            // Check if the last row is incomplete
+            let lastRow = table.querySelector("tr:last-child");
+            if (lastRow) {
+                let lastQuantity = lastRow.querySelector(".quantity").value;
+                let lastPrice = lastRow.querySelector(".price").value;
+
+                if (!lastQuantity || !lastPrice) {
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Complete Previous Entry!',
+                        text: 'Please fill in all details before adding another sale row.'
+                    });
+                    return;
+                }
+            }
+
+            let row = document.createElement("tr");
+            row.setAttribute("data-lot-id", id);
 
             row.innerHTML = `
         <td>
@@ -157,6 +226,7 @@
 
             table.appendChild(row);
         }
+
 
 
         function toggleWeightInput(element) {
