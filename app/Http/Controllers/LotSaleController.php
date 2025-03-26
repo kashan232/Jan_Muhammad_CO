@@ -35,10 +35,11 @@ class LotSaleController extends Controller
     {
         $lots = DB::table('lot_entries')->where('truck_id', $truck_id)->get();
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
-        $customers = Customer::all(); // Fetch all customers
+        $customers = Customer::orderBy('customer_name', 'asc')->get(); // Alphabetically sorted customers
 
         return view('admin_panel.lot_sale.lot_list', compact('lots', 'truck', 'customers'));
     }
+
 
     public function store_lot(Request $request)
     {
@@ -52,6 +53,7 @@ class LotSaleController extends Controller
         ]);
 
         $customerType = $request->customer_type;
+
         $customerId = $request->customer_id ?? null;
         $saleDate = $request->sale_date;
         $subTotal = 0;
@@ -67,6 +69,7 @@ class LotSaleController extends Controller
 
             // Save Sale Record
             LotSale::create([
+                'customer_type' => $customerType,
                 'customer_id' => $customerId,
                 'lot_id' => $sale['lot_id'],
                 'quantity' => $sale['quantity'],
@@ -101,6 +104,30 @@ class LotSaleController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Sale recorded successfully']);
     }
+
+    public function showSaleRecord($truck_id)
+    {
+        // Lot Sales ko fetch karein jo iss truck se connected hain
+        $sales = DB::table('lot_sales')
+            ->join('lot_entries', 'lot_sales.lot_id', '=', 'lot_entries.id')
+            ->join('customers', 'lot_sales.customer_id', '=', 'customers.id')
+            ->where('lot_entries.truck_id', $truck_id)
+            ->select(
+                'customers.customer_name',
+                'customers.customer_phone',
+                'lot_sales.quantity',
+                'lot_sales.price',
+                'lot_sales.total',
+                'lot_sales.sale_date'
+            )
+            ->get();
+
+        // Truck ki details
+        $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
+
+        return view('admin_panel.lot_sale.sale_record', compact('sales', 'truck'));
+    }
+
 
     public function customer_sale()
     {
@@ -137,5 +164,30 @@ class LotSaleController extends Controller
         $sales = $query->orderBy('lot_sales.sale_date')->get();
 
         return response()->json($sales);
+    }
+
+    public function cash_sale()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+
+            // Fetch Cash Sales
+            $cash_sales = DB::table('lot_sales')
+                ->join('lot_entries', 'lot_sales.lot_id', '=', 'lot_entries.id')
+                ->where('lot_sales.customer_type', 'cash') // Sirf cash type ki sales
+                ->select(
+                    'lot_entries.category',
+                    'lot_entries.variety',
+                    'lot_sales.quantity',
+                    'lot_sales.price',
+                    'lot_sales.total',
+                    'lot_sales.sale_date'
+                )
+                ->get();
+
+            return view('admin_panel.lot_sale.cash_sale', compact('cash_sales'));
+        } else {
+            return redirect()->back();
+        }
     }
 }

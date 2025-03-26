@@ -36,6 +36,8 @@
                                             @else
                                             <span class="btn btn-danger btn-sm">Units Sold</span>
                                             @endif
+                                            <a href="{{ route('sale-record', $truck->id) }}" class="btn btn-success btn-sm">Sale Record</a>
+
                                         </td>
                                     </tr>
                                     @endforeach

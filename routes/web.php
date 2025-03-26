@@ -187,6 +187,10 @@ Route::get('/Truck-Entry/{id}', [TruckEntryController::class, 'show'])->name('Tr
 Route::get('/show-trucks', [LotSaleController::class, 'show_trucks'])->name('show-trucks');
 Route::get('/show-Lots/{id}', [LotSaleController::class, 'show_Lots'])->name('show-Lots');
 Route::post('/lot-sale', [LotSaleController::class, 'store_lot'])->name('lot.sale.store');
+Route::get('/sale-record/{truck_id}', [LotSaleController::class, 'showSaleRecord'])->name('sale-record');
+
+Route::get('/cash-sale', [LotSaleController::class, 'cash_sale'])->middleware(['auth', 'admin'])->name('cash-sale');
+
 
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');

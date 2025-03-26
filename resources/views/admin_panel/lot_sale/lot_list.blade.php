@@ -32,6 +32,10 @@
                                 <label>Area</label>
                                 <input type="text" class="form-control" name="area">
                             </div>
+                            <div class="form-group">
+                                <label>Opening Balance</label>
+                                <input type="text" class="form-control" name="opening_balance">
+                            </div>
                         </div>
                         <div class="modal-footer">
                             <button type="submit" class="btn btn-primary w-100">Submit</button>
@@ -55,7 +59,7 @@
                                 <div class="col-md-4 mb-3">
                                     <label for="customer_type" class="form-label">Customer Type</label>
                                     <select class="form-control" id="customer_type" required>
-                                        <option value="">Select Type</option>
+                                        <option value="" selected disabled>Select Type</option>
                                         <option value="credit">Credit Customer</option>
                                         <option value="cash">Cash Customer</option>
                                     </select>
@@ -63,14 +67,15 @@
                                 <div class="col-md-4 mb-3" id="customer_select" style="display: none;">
                                     <label for="customer" class="form-label">Select Customer</label>
                                     <div class="d-flex">
-                                        <select class="form-control" id="customer">
-                                            <option value="">Select Customer</option>
+                                        <select id="customer" class="select2-basic form-control" required>
+                                            <option value="" selected disabled>Select Customer</option>
                                             @foreach($customers as $customer)
                                             <option value="{{ $customer->id }}" data-number="{{ $customer->customer_phone }}">
                                                 {{ $customer->customer_name }}
                                             </option>
                                             @endforeach
                                         </select>
+
                                         <button type="button" class="btn btn-primary ms-2" data-bs-toggle="modal" data-bs-target="#addCustomerModal">
                                             <i class="fas fa-plus"></i>
                                         </button>
@@ -110,10 +115,16 @@
                                             <td>{{ $lot->total_units }}</td>
                                             <td>{{ $lot->lot_quantity }}</td>
                                             <td>
+                                                @if($lot->lot_quantity > 0)
                                                 <button type="button" class="btn btn-success btn-sm"
                                                     onclick="addSaleRow({{ $lot->id }}, '{{ $lot->category }}', '{{ $lot->variety }}', '{{ $lot->unit }}', {{ $lot->lot_quantity }})">
                                                     Add to Sale
                                                 </button>
+                                                @else
+                                                
+                                                <span class="btn btn-danger text-white btn-sm">Out of Stock</span>
+                                                @endif
+
 
 
                                             </td>

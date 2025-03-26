@@ -87,6 +87,9 @@
                         </ul>
                     </div>
                 </li>  
+
+                
+
                 <li class="sidebar-menu-item">
                     <a href="{{ route('supplier') }}" class="nav-link">
                         <i class="menu-icon la la-user-friends"></i>
@@ -139,6 +142,13 @@
                             </li>
                         </ul>
                     </div>
+                </li>
+
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cash-sale') }}" class="nav-link">
+                        <i class="menu-icon fas fa-money-bill"></i>
+                        <span class="menu-title">Cash Sale</span>
+                    </a><i class=""></i>
                 </li>
 
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
