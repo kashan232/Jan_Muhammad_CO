@@ -47,19 +47,27 @@ class LotSaleController extends Controller
             'customer_type' => 'required|string',
             'sale_date' => 'required|date',
             'sales' => 'required|array',
-            'sales.*.lot_id' => 'nullable|integer', // Change 'required' to 'nullable'
+            'sales.*.lot_id' => 'required|integer', // Lot ID zaroori hai
             'sales.*.quantity' => 'required|integer|min:1',
             'sales.*.price' => 'required|numeric|min:0',
         ]);
 
         $customerType = $request->customer_type;
-
         $customerId = $request->customer_id ?? null;
         $saleDate = $request->sale_date;
         $subTotal = 0;
 
         foreach ($request->sales as $sale) {
             $lot = LotEntry::findOrFail($sale['lot_id']);
+
+            // **Available Quantity Check**
+            if ($sale['quantity'] > $lot->lot_quantity) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Only {$lot->lot_quantity} units available for sale in Lot ID: {$lot->id}."
+                ], 400);
+            }
+
             $totalAmount = $sale['quantity'] * $sale['price'];
             $subTotal += $totalAmount;
 
@@ -78,6 +86,7 @@ class LotSaleController extends Controller
                 'sale_date' => $saleDate,
             ]);
         }
+
 
         // Update Customer Ledger for Credit Customer
         if ($customerType === 'credit' && $customerId) {
@@ -104,29 +113,48 @@ class LotSaleController extends Controller
 
         return response()->json(['success' => true, 'message' => 'Sale recorded successfully']);
     }
-
     public function showSaleRecord($truck_id)
     {
-        // Lot Sales ko fetch karein jo iss truck se connected hain
-        $sales = DB::table('lot_sales')
-            ->join('lot_entries', 'lot_sales.lot_id', '=', 'lot_entries.id')
-            ->join('customers', 'lot_sales.customer_id', '=', 'customers.id')
-            ->where('lot_entries.truck_id', $truck_id)
-            ->select(
-                'customers.customer_name',
-                'customers.customer_phone',
-                'lot_sales.quantity',
-                'lot_sales.price',
-                'lot_sales.total',
-                'lot_sales.sale_date'
-            )
+        // Lot-wise data fetch karna
+        $lots = DB::table('lot_entries')
+            ->where('truck_id', $truck_id)
+            ->select('id', 'category', 'variety', 'total_units') // Corrected to total_units
             ->get();
 
-        // Truck ki details
+        foreach ($lots as $lot) {
+            // Total Sold (Cash + Credit) Calculate Karna
+            $sold_quantity = DB::table('lot_sales')
+                ->where('lot_id', $lot->id)
+                ->sum('quantity');
+
+            // Available Quantity Calculate Karna
+            $lot->sold_quantity = $sold_quantity;
+            $lot->available_quantity = $lot->total_units - $sold_quantity;
+
+            // Lot Sales Details Fetch (Cash + Credit Customers)
+            $lot->sales = DB::table('lot_sales')
+                ->leftJoin('customers', 'lot_sales.customer_id', '=', 'customers.id') // LEFT JOIN taake NULL values bhi aa sakein
+                ->where('lot_sales.lot_id', $lot->id)
+                ->select(
+                    DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"), // Agar customer NULL hai toh "Cash Sale"
+                    DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"), // Agar phone NULL hai toh "-"
+                    'lot_sales.quantity',
+                    'lot_sales.price',
+                    'lot_sales.total',
+                    'lot_sales.sale_date',
+                    DB::raw("IF(lot_sales.customer_id IS NULL, 'Cash', 'Credit') as customer_type") // NULL means Cash
+                )
+                ->get();
+        }
+
+        // Truck Details Fetch
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
 
-        return view('admin_panel.lot_sale.sale_record', compact('sales', 'truck'));
+        return view('admin_panel.lot_sale.sale_record', compact('lots', 'truck'));
     }
+
+
+
 
 
     public function customer_sale()

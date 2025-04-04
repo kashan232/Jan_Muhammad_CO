@@ -7,41 +7,61 @@
 
         <div class="body-wrapper">
             <div class="bodywrapper__inner">
-                <div class="d-flex mb-4 flex-wrap gap-3 justify-content-between align-items-center">
-                    <h4>Sale Record for Truck #{{ $truck->truck_number }}</h4>
-                </div>
-                <div class="card shadow-lg">
-                    <div class="card-body">
-                        <div class="table-responsive--sm table-responsive">
-                            <table id="example" class="display  table table--light" style="width:100%">
-                                <thead>
-                                    <tr>
-                                        <th>Customer Name</th>
-                                        <th>Customer Phone</th>
-                                        <th>Sold Units</th>
-                                        <th>Price</th>
-                                        <th>Total</th>
-                                        <th>Sale Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @foreach($sales as $sale)
-                                    <tr>
-                                        <td>{{ $sale->customer_name }}</td>
-                                        <td>{{ $sale->customer_phone }}</td>
-                                        <td>{{ $sale->quantity }}</td>
-                                        <td>{{ $sale->price }}</td>
-                                        <td>{{ $sale->total }}</td>
-                                        <td>{{ $sale->sale_date }}</td>
-                                    </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
+                <div class="container">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary ">
+                            <h4 class="text-white">Sale Record for Truck #{{ $truck->truck_number }}</h4>
+                        </div>
+                        <div class="card-body">
+
+                            @foreach($lots as $lot)
+                            <div class="card my-3 border">
+                                <div class="card-header bg-light">
+                                    <h5>Lot: {{ $lot->category }} - {{ $lot->variety }}</h5>
+                                </div>
+                                <div class="card-body">
+                                    <p><strong>Total Quantity: </strong>{{ $lot->total_units }}</p>
+                                    <p><strong>Total Sold: </strong>{{ $lot->sold_quantity }}</p>
+                                    <p><strong>Available: </strong>{{ $lot->available_quantity }}</p>
+
+                                    <table class="table table-bordered">
+                                        <thead class="table-secondary">
+                                            <tr>
+                                                <th>Customer Name</th>
+                                                <th>Sold Units</th>
+                                                <th>Price</th>
+                                                <th>Total</th>
+                                                <th>Sale Date</th>
+                                                <th>Type</th> <!-- Cash/Credit -->
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach($lot->sales as $sale)
+                                            <tr>
+                                                <td>{{ $sale->customer_name }}</td>
+                                                <td>{{ $sale->quantity }}</td>
+                                                <td>{{ number_format($sale->price, 2) }}</td>
+                                                <td>{{ number_format($sale->total, 2) }}</td>
+                                                <td>{{ \Carbon\Carbon::parse($sale->sale_date)->format('d M, Y') }}</td>
+                                                <td>
+                                                    <span class="badge {{ $sale->customer_type == 'Credit' ? 'bg-danger' : 'bg-success' }}">
+                                                        {{ $sale->customer_type }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            @endforeach
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                            @endforeach
+
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
     @include('admin_panel.include.footer_include')
 </body>
