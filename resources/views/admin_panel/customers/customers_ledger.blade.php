@@ -23,7 +23,7 @@
                     <div class="modal-body">
                         <form id="recoveryForm">
                             @csrf
-                            <input type="hidden" id="ledger_id" name="ledger_id">
+                            <input type="text" id="ledger_id" name="ledger_id">
                             <div class="mb-3">
                                 <label for="closing_balance" class="form-label">Closing Balance</label>
                                 <input type="text" class="form-control" id="closing_balance" name="closing_balance" readonly>
@@ -82,7 +82,7 @@
                                                 <td>{{ $ledger->updated_at->format('Y-m-d H:i:s') }}</td>
                                                 <td>
                                                     <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#recoveryModal"
-                                                        data-id="{{ $ledger->id }}"
+                                                        data-id="{{ $ledger->customer_id }}"
                                                         data-closing-balance="{{ $ledger->closing_balance }}">
                                                         Add Recovery
                                                     </button>

@@ -34,7 +34,8 @@
                                         <td>{{ $entry->vendor_id }}</td>
                                         <td>{{ date('d-m-Y', strtotime($entry->entry_date)) }}</td>
                                         <td>
-                                            <a href="{{ route('Truck-Entry.Show', $entry->id) }}" class="btn btn-primary btn-sm">View</a>
+                                            <a href="{{ route('Truck-Entry.Show', $entry->id) }}" class="btn btn-dark btn-sm">View</a>
+                                            <a href="{{ route('Truck-Entry.Edit', $entry->id) }}" class="btn btn-primary btn-sm">Edit</a>
                                         </td>
                                     </tr>
                                     @endforeach

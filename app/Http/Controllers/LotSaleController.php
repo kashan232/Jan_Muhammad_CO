@@ -26,10 +26,32 @@ class LotSaleController extends Controller
                 DB::raw('SUM(lot_entries.lot_quantity) as total_units')
             )
             ->groupBy('truck_entries.id', 'truck_entries.truck_number', 'truck_entries.vendor_id', 'truck_entries.entry_date')
+            ->having('total_units', '>', 0)
             ->get();
 
         return view('admin_panel.lot_sale.truck_list', compact('trucks'));
     }
+
+
+    public function trucks_sold()
+    {
+        $trucks = DB::table('truck_entries')
+            ->leftJoin('lot_entries', 'truck_entries.id', '=', 'lot_entries.truck_id')
+            ->select(
+                'truck_entries.id',
+                'truck_entries.truck_number',
+                'truck_entries.vendor_id',
+                'truck_entries.entry_date',
+                DB::raw('SUM(lot_entries.lot_quantity) as total_units')
+            )
+            ->groupBy('truck_entries.id', 'truck_entries.truck_number', 'truck_entries.vendor_id', 'truck_entries.entry_date')
+            ->having('total_units', '<=', 0) // 👈 this is the key line
+            ->get();
+
+        return view('admin_panel.lot_sale.trucks_sold', compact('trucks'));
+    }
+
+
 
     public function show_Lots($truck_id)
     {
@@ -133,25 +155,39 @@ class LotSaleController extends Controller
 
             // Lot Sales Details Fetch (Cash + Credit Customers)
             $lot->sales = DB::table('lot_sales')
-                ->leftJoin('customers', 'lot_sales.customer_id', '=', 'customers.id') // LEFT JOIN taake NULL values bhi aa sakein
+                ->leftJoin('customers', 'lot_sales.customer_id', '=', 'customers.id')
                 ->where('lot_sales.lot_id', $lot->id)
                 ->select(
-                    DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"), // Agar customer NULL hai toh "Cash Sale"
-                    DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"), // Agar phone NULL hai toh "-"
+                    'lot_sales.id', // 👈 This is required for form
+                    DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"),
+                    DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"),
                     'lot_sales.quantity',
                     'lot_sales.price',
                     'lot_sales.total',
                     'lot_sales.sale_date',
-                    DB::raw("IF(lot_sales.customer_id IS NULL, 'Cash', 'Credit') as customer_type") // NULL means Cash
+                    DB::raw("IF(lot_sales.customer_id IS NULL, 'Cash', 'Credit') as customer_type")
                 )
                 ->get();
         }
 
         // Truck Details Fetch
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
-
         return view('admin_panel.lot_sale.sale_record', compact('lots', 'truck'));
     }
+
+    public function updateLotSale(Request $request)
+    {
+        
+        $sale = LotSale::find($request->sale_id);
+        $sale->quantity = $request->quantity;
+        $sale->price = $request->price;
+        $sale->sale_date = $request->sale_date;
+        $sale->save();
+
+        return back()->with('success', 'Sale record updated successfully!');
+    }
+
+
 
 
 
@@ -217,5 +253,49 @@ class LotSaleController extends Controller
         } else {
             return redirect()->back();
         }
+    }
+
+    public function daily_sale()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+
+            return view('admin_panel.lot_sale.daily_sale');
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function getDailySales(Request $request)
+    {
+        $start = $request->start_date;
+        $end = $request->end_date;
+
+        $sales = LotSale::whereBetween('sale_date', [$start, $end])
+            ->with([
+                'lot.truckEntry:id,truck_number',
+                'lot:id,truck_id,category,variety,unit,unit_in',
+                'customer:id,customer_name'
+            ])
+            ->get();
+
+        $data = $sales->map(function ($sale) {
+            return [
+                'customer' => $sale->customer_type === 'cash'
+                    ? 'Cash'
+                    : ($sale->customer->customer_name ?? 'N/A'),
+                'truck_number' => $sale->lot->truckEntry->truck_number ?? 'N/A',
+                'category' => $sale->lot->category ?? 'N/A',
+                'variety' => $sale->lot->variety ?? 'N/A',
+                'unit' => $sale->lot->unit ?? 'N/A',
+                'unit_in' => $sale->lot->unit_in ?? 'N/A',
+                'quantity' => $sale->quantity,
+                'price' => $sale->price,
+                'total' => $sale->total,
+                'sale_date' => $sale->sale_date,
+            ];
+        });
+
+        return response()->json($data);
     }
 }

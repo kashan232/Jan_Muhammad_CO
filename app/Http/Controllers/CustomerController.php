@@ -6,9 +6,11 @@ use App\Models\Customer;
 use App\Models\CustomerCredit;
 use App\Models\CustomerLedger;
 use App\Models\CustomerRecovery;
+use App\Models\LotSale;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -54,8 +56,6 @@ class CustomerController extends Controller
         } else {
             return redirect()->back();
         }
-
-        
     }
     public function update_customer(Request $request)
     {
@@ -124,17 +124,19 @@ class CustomerController extends Controller
 
     public function customer_recovery_store(Request $request)
     {
-        $ledger = CustomerLedger::find($request->ledger_id);
+        // Find ledger using customer_id
+        $ledger = CustomerLedger::where('customer_id', $request->ledger_id)->first();
+
+        // Adjust balances
         $ledger->previous_balance -= $request->amount_paid;
         $ledger->closing_balance -= $request->amount_paid;
         $ledger->save();
-
         $userId = Auth::id();
 
         // Store recovery record (Optional)
         CustomerRecovery::create([
             'admin_or_user_id' => $userId,
-            'customer_ledger_id' => $ledger->id,
+            'customer_ledger_id' => $ledger->customer_id,
             'amount_paid' => $request->amount_paid,
             'description' => $request->description,
             'date' => $request->date,
@@ -158,6 +160,54 @@ class CustomerController extends Controller
     }
 
 
+    public function Customer_balance()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+            $CustomerLedgers = CustomerLedger::where('admin_or_user_id', $userId)->with('Customer')->get();
+            return view('admin_panel.customers.Customer_balance', compact('CustomerLedgers'));
+        } else {
+            return redirect()->back();
+        }
+    }
 
-   
+    public function fetchLedger($id)
+    {
+        $sales = DB::table('lot_sales')
+            ->where('customer_id', $id)
+            ->select(
+                'id', // This is lot_sales.id
+                'sale_date as date',
+                DB::raw("'Sale' as type"),
+                'total as amount',
+                DB::raw("CONCAT('Lot ID: ', lot_id) as remarks"),
+                'lot_id'
+            )
+            ->get();
+
+
+        $recoveries = DB::table('customer_recoveries')
+            ->where('customer_ledger_id', $id)
+            ->select(
+                'id',
+                'date as date',
+                DB::raw("'Recovery' as type"),
+                'amount_paid as amount',
+                'description as remarks'
+            )
+            ->get();
+
+        $merged = $sales->concat($recoveries)->sortByDesc('date')->values();
+
+        return response()->json($merged);
+    }
+
+    public function getLotDetails($id)
+    {
+        $lotSale = DB::table('lot_sales')
+            ->where('id', $id)
+            ->first();
+
+        return response()->json($lotSale);
+    }
 }

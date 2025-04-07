@@ -71,6 +71,13 @@
                             </li>
 
                             <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('Customer-balance') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Customers Balance</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
                                 <a class="nav-link" href="{{ route('customer-ledger') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">Cutomers Ledger</span>
@@ -81,6 +88,13 @@
                                 <a class="nav-link" href="{{ route('customer-recovery') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
                                     <span class="menu-title">Cutomers Recoveries</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('customer-sale') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> Customer sale </span>
                                 </a>
                             </li>
 
@@ -131,15 +145,17 @@
                             <li class="sidebar-menu-item ">
                                 <a class="nav-link" href="{{ route('show-trucks') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title"> sale </span>
+                                    <span class="menu-title"> Available Truck </span>
                                 </a>
                             </li>
+
                             <li class="sidebar-menu-item ">
-                                <a class="nav-link" href="{{ route('customer-sale') }}">
+                                <a class="nav-link" href="{{ route('trucks-sold') }}">
                                     <i class="menu-icon las la-dot-circle"></i>
-                                    <span class="menu-title"> Customer sale </span>
+                                    <span class="menu-title"> Sold Truck </span>
                                 </a>
                             </li>
+                            
                         </ul>
                     </div>
                 </li>
@@ -150,7 +166,12 @@
                         <span class="menu-title">Cash Sale</span>
                     </a><i class=""></i>
                 </li>
-
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('daily-sale') }}" class="nav-link">
+                        <i class="menu-icon fas fa-money-bill"></i>
+                        <span class="menu-title">Daily Sale</span>
+                    </a><i class=""></i>
+                </li>
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>

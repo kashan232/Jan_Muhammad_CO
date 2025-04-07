@@ -184,16 +184,30 @@ Route::post('/Truck-Entry/Store', [TruckEntryController::class, 'store'])->name(
 Route::get('/Truck-Entries', [TruckEntryController::class, 'Truck_Enters'])->name('Truck-Entries');
 Route::get('/Truck-Entry/{id}', [TruckEntryController::class, 'show'])->name('Truck-Entry.Show');
 
+Route::get('/truck-entry/edit/{id}', [TruckEntryController::class, 'edit'])->name('Truck-Entry.Edit');
+Route::put('/truck_entries/{id}', [TruckEntryController::class, 'update'])->name('truck_entries.update');
+
+
 Route::get('/show-trucks', [LotSaleController::class, 'show_trucks'])->name('show-trucks');
 Route::get('/show-Lots/{id}', [LotSaleController::class, 'show_Lots'])->name('show-Lots');
 Route::post('/lot-sale', [LotSaleController::class, 'store_lot'])->name('lot.sale.store');
 Route::get('/sale-record/{truck_id}', [LotSaleController::class, 'showSaleRecord'])->name('sale-record');
+Route::post('/update-lot-sale', [LotSaleController::class, 'updateLotSale'])->name('update.lot.sale');
 
 Route::get('/cash-sale', [LotSaleController::class, 'cash_sale'])->middleware(['auth', 'admin'])->name('cash-sale');
+Route::get('/daily-sale', [LotSaleController::class, 'daily_sale'])->middleware(['auth', 'admin'])->name('daily-sale');
+Route::post('/daily-sale-report', [LotSaleController::class, 'getDailySales'])->name('daily.sales');
 
+Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('trucks-sold');
 
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
+
+
+Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])->middleware(['auth', 'admin'])->name('Customer-balance');
+Route::get('/customer-ledger/{id}', [CustomerController::class, 'fetchLedger'])->name('customer.ledger');
+Route::get('/lot/sale/{id}', [CustomerController::class, 'getLotDetails'])->name('lot.sale.details');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
