@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\LotEntry;
 use App\Models\LotSale;
+use App\Models\VendorBill;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -37,19 +38,28 @@ class LotSaleController extends Controller
     {
         $trucks = DB::table('truck_entries')
             ->leftJoin('lot_entries', 'truck_entries.id', '=', 'lot_entries.truck_id')
+            ->leftJoin('vendor_bills', 'truck_entries.id', '=', 'vendor_bills.truck_id') // 👈 JOIN vendor_bills
             ->select(
                 'truck_entries.id',
                 'truck_entries.truck_number',
                 'truck_entries.vendor_id',
                 'truck_entries.entry_date',
-                DB::raw('SUM(lot_entries.lot_quantity) as total_units')
+                DB::raw('SUM(lot_entries.lot_quantity) as total_units'),
+                'vendor_bills.id as bill_id' // 👈 check if bill exists
             )
-            ->groupBy('truck_entries.id', 'truck_entries.truck_number', 'truck_entries.vendor_id', 'truck_entries.entry_date')
-            ->having('total_units', '<=', 0) // 👈 this is the key line
+            ->groupBy(
+                'truck_entries.id',
+                'truck_entries.truck_number',
+                'truck_entries.vendor_id',
+                'truck_entries.entry_date',
+                'vendor_bills.id'
+            )
+            ->having('total_units', '<=', 0)
             ->get();
 
         return view('admin_panel.lot_sale.trucks_sold', compact('trucks'));
     }
+
 
 
 
@@ -177,7 +187,7 @@ class LotSaleController extends Controller
 
     public function updateLotSale(Request $request)
     {
-        
+
         $sale = LotSale::find($request->sale_id);
         $sale->quantity = $request->quantity;
         $sale->price = $request->price;
@@ -297,5 +307,83 @@ class LotSaleController extends Controller
         });
 
         return response()->json($data);
+    }
+
+    public function Create_Bill($truck_id)
+    {
+        $lots = DB::table('lot_entries')->where('truck_id', $truck_id)->get();
+        $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
+        $customers = Customer::orderBy('customer_name', 'asc')->get(); // Alphabetically sorted customers
+
+        return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers'));
+    }
+
+    public function store_Bill(Request $request)
+    {
+        // Validation
+        $request->validate([
+            'truck_id' => 'required|integer',
+            'trucknumber' => 'required|string',
+            'subtotal' => 'required|numeric',
+            'total_expense' => 'required|numeric',
+            'net_pay' => 'required|numeric',
+            'bill_details' => 'required|array',
+            'expenses' => 'required|array',
+        ]);
+
+        // Extract bill_details
+        $lot_ids = [];
+        $sale_units = [];
+        $rates = [];
+        $amounts = [];
+        $unit_ins = [];
+
+        foreach ($request->bill_details as $detail) {
+            $lot_ids[] = $detail['lot_id'];
+            $sale_units[] = $detail['sale_units'];
+            $rates[] = $detail['rate'];
+            $amounts[] = $detail['amount'];
+            $unit_ins[] = $detail['unit_in'];
+        }
+
+        // Extract expenses
+        $categories = [];
+        $values = [];
+        $final_amounts = [];
+
+        foreach ($request->expenses as $exp) {
+            $categories[] = $exp['category'];
+            $values[] = $exp['value'];
+            $final_amounts[] = $exp['final_amount'];
+        }
+
+        // Save to vendor_bills table
+        $bill = new VendorBill();
+        $bill->truck_id = $request->truck_id;
+        $bill->trucknumber = $request->trucknumber;
+        $bill->subtotal = $request->subtotal;
+        $bill->total_expense = $request->total_expense;
+        $bill->net_pay = $request->net_pay;
+
+        // Store each field as JSON array in its column
+        $bill->lot_id = json_encode($lot_ids);
+        $bill->sale_units = json_encode($sale_units);
+        $bill->rate = json_encode($rates);
+        $bill->amount = json_encode($amounts);
+        $bill->unit_in = json_encode($unit_ins);
+
+        $bill->category = json_encode($categories);
+        $bill->value = json_encode($values);
+        $bill->final_amount = json_encode($final_amounts);
+
+        $bill->save();
+
+        return response()->json(['success' => true, 'message' => 'Vendor bill saved successfully.']);
+    }
+
+    public function view($id)
+    {
+        $bill = VendorBill::findOrFail($id);
+        return view('admin_panel.lot_sale.view_bill', compact('bill'));
     }
 }

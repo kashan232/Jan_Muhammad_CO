@@ -35,9 +35,15 @@
                                             <a href="{{ route('show-Lots', $truck->id) }}" class="btn btn-primary btn-sm">Sale</a>
                                             @else
                                             <span class="btn btn-danger btn-sm">Units Sold</span>
-                                            @endif
-                                            <a href="{{ route('sale-record', $truck->id) }}" class="btn btn-success btn-sm">Sale Record</a>
 
+                                            @if($truck->bill_id)
+                                            <a href="{{ route('view-vendor-bill', $truck->bill_id) }}" class="btn btn-secondary btn-sm">View Bill</a>
+                                            @else
+                                            <a href="{{ route('Create-Bill', $truck->id) }}" class="btn btn-primary btn-sm">Create Bill</a>
+                                            @endif
+                                            @endif
+
+                                            <a href="{{ route('sale-record', $truck->id) }}" class="btn btn-success btn-sm">Sale Record</a>
                                         </td>
                                     </tr>
                                     @endforeach

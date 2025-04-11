@@ -111,7 +111,7 @@ class TruckEntryController extends Controller
         $Units = Unit::all();
         $UnitIns = UnitIn::all();
 
-        return view('admin_panel.truck_entry.truck_edit', compact('truckEntry', 'lotEntries', 'vendors', 'categories', 'varieties', 'Units', 'UnitIns'));
+        return view('admin_panel.Truck_entry.truck_edit', compact('truckEntry', 'lotEntries', 'vendors', 'categories', 'varieties', 'Units', 'UnitIns'));
     }
 
     public function update(Request $request, $id)

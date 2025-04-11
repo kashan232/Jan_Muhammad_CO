@@ -203,6 +203,10 @@ Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('tru
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
 
+Route::get('/Create-Bill/{id}', [LotSaleController::class, 'Create_Bill'])->name('Create-Bill');
+Route::post('/vendor-bill/store', [LotSaleController::class, 'store_Bill'])->name('vendor.bill.store');
+Route::get('/vendor-bill/view/{id}', [LotSaleController::class, 'view'])->name('view-vendor-bill');
+
 
 Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])->middleware(['auth', 'admin'])->name('Customer-balance');
 Route::get('/customer-ledger/{id}', [CustomerController::class, 'fetchLedger'])->name('customer.ledger');
