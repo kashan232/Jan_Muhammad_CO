@@ -38,6 +38,7 @@
 
                                             @if($truck->bill_id)
                                             <a href="{{ route('view-vendor-bill', $truck->bill_id) }}" class="btn btn-secondary btn-sm">View Bill</a>
+                                            <a href="{{ route('bill-book', $truck->bill_id) }}" class="btn btn-dark btn-sm">Bill Book</a>
                                             @else
                                             <a href="{{ route('Create-Bill', $truck->id) }}" class="btn btn-primary btn-sm">Create Bill</a>
                                             @endif

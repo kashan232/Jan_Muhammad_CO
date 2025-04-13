@@ -15,8 +15,8 @@
                         <form method="POST" id="billForm" onsubmit="return validateBill()">
                             @csrf
                             <h4 class="fw-bold text-primary mt-4">Create Bill For Vendor (Truck: {{ $truck->truck_number }})</h4>
-                            <input type="text" name="truck_id" value="{{ $truck->id }}">
-                            <input type="text" name="truck_number" value="{{ $truck->truck_number }}">
+                            <input type="hidden" name="truck_id" value="{{ $truck->id }}">
+                            <input type="hidden" name="truck_number" value="{{ $truck->truck_number }}">
                             <div class="table-responsive">
                                 <table class="table table-striped">
                                     <thead>
@@ -27,6 +27,8 @@
                                             <th>Unit In</th>
                                             <th>Total Units</th>
                                             <th>Available Units</th>
+                                            <th>Sale Average</th>
+                                            <th>Total Sale</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -39,6 +41,8 @@
                                             <td>{{ $lot->unit_in }}</td>
                                             <td>{{ $lot->total_units }}</td>
                                             <td>{{ $lot->lot_quantity }}</td>
+                                            <td>{{ number_format($lot->average_sale, 2) }}</td>
+                                            <td>{{ number_format($lot->total_sale, 2) }}</td>
                                             <td>
                                                 <button type="button" class="btn btn-primary btn-sm"
                                                     onclick="addBillRow({{ $lot->id }}, '{{ $lot->category }}', '{{ $lot->variety }}', '{{ $lot->unit }}', {{ $lot->total_units }}, '{{ $lot->unit_in }}')">

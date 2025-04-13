@@ -206,6 +206,7 @@ Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->nam
 Route::get('/Create-Bill/{id}', [LotSaleController::class, 'Create_Bill'])->name('Create-Bill');
 Route::post('/vendor-bill/store', [LotSaleController::class, 'store_Bill'])->name('vendor.bill.store');
 Route::get('/vendor-bill/view/{id}', [LotSaleController::class, 'view'])->name('view-vendor-bill');
+Route::get('/bill-book/view/{id}', [LotSaleController::class, 'bill_book'])->name('bill-book');
 
 
 Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])->middleware(['auth', 'admin'])->name('Customer-balance');

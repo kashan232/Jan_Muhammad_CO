@@ -6,6 +6,7 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\LotEntry;
 use App\Models\LotSale;
+use App\Models\TruckEntry;
 use App\Models\VendorBill;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -311,12 +312,34 @@ class LotSaleController extends Controller
 
     public function Create_Bill($truck_id)
     {
-        $lots = DB::table('lot_entries')->where('truck_id', $truck_id)->get();
+        $lots = DB::table('lot_entries')
+            ->where('truck_id', $truck_id)
+            ->get()
+            ->map(function ($lot) {
+                // Get all sales for this lot
+                $sales = DB::table('lot_sales')->where('lot_id', $lot->id)->get();
+
+                // Calculate total sale for this lot
+                $totalSale = $sales->sum(function ($sale) {
+                    return $sale->quantity * $sale->price;
+                });
+
+                // Calculate average sale
+                $averageSale = $lot->total_units > 0 ? $totalSale / $lot->total_units : 0;
+
+                // Attach to object
+                $lot->total_sale = $totalSale;
+                $lot->average_sale = $averageSale;
+
+                return $lot;
+            });
+
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
-        $customers = Customer::orderBy('customer_name', 'asc')->get(); // Alphabetically sorted customers
+        $customers = Customer::orderBy('customer_name', 'asc')->get();
 
         return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers'));
     }
+
 
     public function store_Bill(Request $request)
     {
@@ -385,5 +408,38 @@ class LotSaleController extends Controller
     {
         $bill = VendorBill::findOrFail($id);
         return view('admin_panel.lot_sale.view_bill', compact('bill'));
+    }
+
+    public function bill_book($id)
+    {
+        $bill = VendorBill::find($id);
+
+        // Truck entry find using truck_id
+        $truckEntry = TruckEntry::where('id', $bill->truck_id)->first();
+
+        // Vendor name
+        $vendorName = $truckEntry->vendor_id ?? 'N/A';
+
+        // Get lot_ids (JSON to array)
+        $lot_ids = json_decode($bill->lot_id, true); // ["1","2"]
+
+        // Get entries for those lot_ids
+        $lotEntries = LotEntry::whereIn('id', $lot_ids)->get();
+
+        // Separate arrays for each field
+        $lotcategories = $lotEntries->pluck('category')->toArray();
+        $varieties = $lotEntries->pluck('variety')->toArray();
+        $units = $lotEntries->pluck('unit')->toArray();
+        $units_in = $lotEntries->pluck('unit_in')->toArray();
+
+        return view('admin_panel.lot_sale.bill_book', compact(
+            'bill',
+            'vendorName',
+            'lot_ids',
+            'lotcategories',
+            'varieties',
+            'units',
+            'units_in'
+        ));
     }
 }
