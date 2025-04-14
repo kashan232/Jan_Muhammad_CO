@@ -57,11 +57,8 @@
                                                 <td>0</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}"data-city="{{ $Supplier->city }}"data-area="{{ $Supplier->area }}">
+                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}" data-city="{{ $Supplier->city }}" data-area="{{ $Supplier->area }}">
                                                             <i class="la la-pencil"></i>Edit </button>
-
-                                                        <a href="#" class="btn btn-sm btn-outline--info">
-                                                            <i class="las la-money-bill-wave-alt"></i>Payment </a>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -111,6 +108,12 @@
                                             <div class="form-group">
                                                 <label>Area</label>
                                                 <input type="text" name="area" class="form-control" autocomplete="off" value="">
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Opening Balance</label>
+                                                <input type="number" name="opening_balance" class="form-control">
                                             </div>
                                         </div>
                                     </div>
@@ -166,8 +169,13 @@
                                                 <input type="text" name="area" id="sup_area" class="form-control" autocomplete="off" value="">
                                             </div>
                                         </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Opening Balance</label>
+                                                <input type="number" name="opening_balance" class="form-control">
+                                            </div>
+                                        </div>
 
-                                        
                                     </div>
                                 </div>
                                 <div class="modal-footer">
@@ -192,7 +200,7 @@
                 var supplierId = $(this).data('supplier-id');
                 var suppliername = $(this).data('supplier-name');
                 var suppliermobile = $(this).data('supplier-mobile');
-                var suppliercity= $(this).data('city');
+                var suppliercity = $(this).data('city');
                 var supplierarea = $(this).data('area');
                 $('#supplier_id').val(supplierId);
                 $('#suplier_name').val(suppliername);

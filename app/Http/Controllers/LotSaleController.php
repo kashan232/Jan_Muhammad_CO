@@ -84,7 +84,7 @@ class LotSaleController extends Controller
             'sales.*.quantity' => 'required|integer|min:1',
             'sales.*.price' => 'required|numeric|min:0',
         ]);
-
+        // dd($request);
         $customerType = $request->customer_type;
         $customerId = $request->customer_id ?? null;
         $saleDate = $request->sale_date;
@@ -115,6 +115,7 @@ class LotSaleController extends Controller
                 'lot_id' => $sale['lot_id'],
                 'quantity' => $sale['quantity'],
                 'price' => $sale['price'],
+                'weight' => $sale['weight'],
                 'total' => $totalAmount,
                 'sale_date' => $saleDate,
             ]);
@@ -169,10 +170,11 @@ class LotSaleController extends Controller
                 ->leftJoin('customers', 'lot_sales.customer_id', '=', 'customers.id')
                 ->where('lot_sales.lot_id', $lot->id)
                 ->select(
-                    'lot_sales.id', // 👈 This is required for form
+                    'lot_sales.id',
                     DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"),
                     DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"),
                     'lot_sales.quantity',
+                    'lot_sales.weight', // Add this
                     'lot_sales.price',
                     'lot_sales.total',
                     'lot_sales.sale_date',

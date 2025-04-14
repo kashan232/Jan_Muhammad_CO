@@ -112,6 +112,9 @@ Route::post('/update-warehouse', [WarehouseController::class, 'update_warehouse'
 Route::get('/supplier', [SupplierController::class, 'supplier'])->middleware(['auth','admin'])->name('supplier');
 Route::post('/store-supplier', [SupplierController::class, 'store_supplier'])->name('store-supplier');
 Route::post('/update-supplier', [SupplierController::class, 'update_supplier'])->name('update-supplier');
+Route::get('/supplier-ledger', [SupplierController::class, 'supplier_ledger'])->middleware(['auth', 'admin'])->name('supplier-ledger');
+Route::post('/supplier-payment-store', [SupplierController::class, 'supplier_payment_store'])->name('supplier-payment-store');
+Route::get('/supplier-payment', [SupplierController::class, 'supplier_payment'])->name('supplier-payment');
 
 //Staff
 Route::get('/staff', [StaffController::class, 'staff'])->middleware(['auth','admin'])->name('staff');

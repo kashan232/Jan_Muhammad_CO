@@ -292,12 +292,14 @@
                 let quantity = parseFloat(row.querySelector(".quantity").value);
                 let price = parseFloat(row.querySelector(".price").value);
                 let lotId = row.getAttribute("data-lot-id"); // Lot ID ko extract karein
+                let weight = parseFloat(row.querySelector(".weight").value);
 
                 if (lotId) { // Ensure ke lot_id null na ho
                     salesData.push({
                         lot_id: lotId,
                         quantity: quantity,
-                        price: price
+                        price: price,
+                        weight: weight
                     });
                 }
             });

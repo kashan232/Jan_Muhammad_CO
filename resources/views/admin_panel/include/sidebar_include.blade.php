@@ -103,13 +103,36 @@
                 </li>  
 
                 
-
-                <li class="sidebar-menu-item">
-                    <a href="{{ route('supplier') }}" class="nav-link">
-                        <i class="menu-icon la la-user-friends"></i>
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="menu-icon las la-users"></i>
                         <span class="menu-title">Vendor</span>
                     </a>
-                </li>
+                    <div class="sidebar-submenu ">
+                        <ul>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('supplier') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Vendor</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('supplier-ledger') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Vendor Ledger</span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('supplier-payment') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title">Vendor Payments</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </li>  
 
                 <li class="sidebar-menu-item sidebar-dropdown">
                     <a  href="javascript:void(0)">

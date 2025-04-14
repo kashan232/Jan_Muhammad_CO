@@ -29,7 +29,7 @@
                                     <p><strong>Available:</strong> {{ $lot->available_quantity }}</p>
                                     @php
                                     $totalAmount = $lot->sales->sum(function($sale) {
-                                    return $sale->quantity * $sale->price;
+                                    return ($sale->weight ? $sale->weight : $sale->quantity) * $sale->price;
                                     });
 
                                     $averageSale = $lot->total_units > 0 ? $totalAmount / $lot->total_units : 0;
@@ -43,6 +43,7 @@
                                                 <tr>
                                                     <th>Customer Name</th>
                                                     <th>Sold Units</th>
+                                                    <th>Weight</th> <!-- Add this -->
                                                     <th>Price</th>
                                                     <th>Total</th>
                                                     <th>Sale Date</th>
@@ -55,8 +56,11 @@
                                                 <tr>
                                                     <td>{{ $sale->customer_name }}</td>
                                                     <td>{{ $sale->quantity }}</td>
+                                                    <td>{{ $sale->weight ?? '-' }}</td> <!-- Add this -->
                                                     <td>{{ number_format($sale->price, 2) }}</td>
-                                                    <td>{{ number_format($sale->quantity * $sale->price, 2) }}</td>
+                                                    <td>
+                                                        {{ number_format(($sale->weight ?? $sale->quantity) * $sale->price, 2) }}
+                                                    </td>
                                                     <td>{{ \Carbon\Carbon::parse($sale->sale_date)->format('d M, Y') }}</td>
                                                     <td>
                                                         <span class="badge {{ $sale->customer_type == 'Credit' ? 'bg-danger' : 'bg-success' }}">
