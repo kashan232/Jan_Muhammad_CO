@@ -6,6 +6,8 @@ use App\Models\Customer;
 use App\Models\CustomerLedger;
 use App\Models\LotEntry;
 use App\Models\LotSale;
+use App\Models\Supplier;
+use App\Models\SupplierLedger;
 use App\Models\TruckEntry;
 use App\Models\VendorBill;
 use Carbon\Carbon;
@@ -345,44 +347,38 @@ class LotSaleController extends Controller
 
     public function store_Bill(Request $request)
     {
-        // Validation
-        $request->validate([
-            'truck_id' => 'required|integer',
-            'trucknumber' => 'required|string',
-            'subtotal' => 'required|numeric',
-            'total_expense' => 'required|numeric',
-            'net_pay' => 'required|numeric',
-            'bill_details' => 'required|array',
-            'expenses' => 'required|array',
-        ]);
+        // Step 1: Truck Entry fetch karo
+        $truckEntry = TruckEntry::find($request->truck_id);
+        if (!$truckEntry) {
+            return response()->json(['success' => false, 'message' => 'Truck not found'], 404);
+        }
+        // Step 2: TruckEntry se vendor name lo
+        $vendorName = $truckEntry->vendor_id; // assuming vendor_id is actually name
 
-        // Extract bill_details
-        $lot_ids = [];
-        $sale_units = [];
-        $rates = [];
-        $amounts = [];
-        $unit_ins = [];
-
-        foreach ($request->bill_details as $detail) {
-            $lot_ids[] = $detail['lot_id'];
-            $sale_units[] = $detail['sale_units'];
-            $rates[] = $detail['rate'];
-            $amounts[] = $detail['amount'];
-            $unit_ins[] = $detail['unit_in'];
+        // Step 3: Supplier table me vendor name se supplier nikalna
+        $supplier = Supplier::where('name', $vendorName)->first();
+        if (!$supplier) {
+            return response()->json(['success' => false, 'message' => 'Supplier not found'], 404);
         }
 
-        // Extract expenses
-        $categories = [];
-        $values = [];
-        $final_amounts = [];
+        // Step 4: Supplier Ledger me supplier ka record nikalna
+        $ledger = SupplierLedger::where('supplier_id', $supplier->id)->latest()->first();
 
-        foreach ($request->expenses as $exp) {
-            $categories[] = $exp['category'];
-            $values[] = $exp['value'];
-            $final_amounts[] = $exp['final_amount'];
+        // Step 5: Ledger update ya create
+        if ($ledger) {
+            $ledger->previous_balance = $ledger->closing_balance;
+            $ledger->closing_balance += $request->net_pay;
+            $ledger->save();
+        } else {
+            SupplierLedger::create([
+                'supplier_id' => $supplier->id,
+                'previous_balance' => 0,
+                'closing_balance' => $request->net_pay,
+                'admin_or_user_id' => auth()->id() ?? 1, // optional
+            ]);
         }
 
-        // Save to vendor_bills table
+        // ✅ Save Bill
         $bill = new VendorBill();
         $bill->truck_id = $request->truck_id;
         $bill->trucknumber = $request->trucknumber;
@@ -390,20 +386,19 @@ class LotSaleController extends Controller
         $bill->total_expense = $request->total_expense;
         $bill->net_pay = $request->net_pay;
 
-        // Store each field as JSON array in its column
-        $bill->lot_id = json_encode($lot_ids);
-        $bill->sale_units = json_encode($sale_units);
-        $bill->rate = json_encode($rates);
-        $bill->amount = json_encode($amounts);
-        $bill->unit_in = json_encode($unit_ins);
+        $bill->lot_id = json_encode(array_column($request->bill_details, 'lot_id'));
+        $bill->sale_units = json_encode(array_column($request->bill_details, 'sale_units'));
+        $bill->rate = json_encode(array_column($request->bill_details, 'rate'));
+        $bill->amount = json_encode(array_column($request->bill_details, 'amount'));
+        $bill->unit_in = json_encode(array_column($request->bill_details, 'unit_in'));
 
-        $bill->category = json_encode($categories);
-        $bill->value = json_encode($values);
-        $bill->final_amount = json_encode($final_amounts);
+        $bill->category = json_encode(array_column($request->expenses, 'category'));
+        $bill->value = json_encode(array_column($request->expenses, 'value'));
+        $bill->final_amount = json_encode(array_column($request->expenses, 'final_amount'));
 
         $bill->save();
 
-        return response()->json(['success' => true, 'message' => 'Vendor bill saved successfully.']);
+        return response()->json(['success' => true, 'message' => 'Vendor bill saved and ledger updated.']);
     }
 
     public function view($id)

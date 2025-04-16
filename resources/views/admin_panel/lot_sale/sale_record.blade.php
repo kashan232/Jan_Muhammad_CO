@@ -32,7 +32,7 @@
                                     return ($sale->weight ? $sale->weight : $sale->quantity) * $sale->price;
                                     });
 
-                                    $averageSale = $lot->total_units > 0 ? $totalAmount / $lot->total_units : 0;
+                                    $averageSale = $lot->sold_quantity > 0 ? $totalAmount / $lot->sold_quantity : 0;
                                     @endphp
 
                                     <p><strong>Total Sale Amount:</strong> Rs. {{ number_format($totalAmount, 2) }}</p>

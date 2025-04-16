@@ -92,9 +92,16 @@
                                 </table>
                             </div>
 
-                            <div class="d-flex justify-content-between mt-3">
-                                <h5 class="fw-bold">Total Mazdori: <span id="totalMazdori">0</span></h5>
+                            <div class="d-flex justify-content-between align-items-center mt-3">
+                                <h5 class="fw-bold mb-0">
+                                    Total Mazdori: <span id="totalMazdori">0</span>
+                                    <a onclick="copyMazdori()" class="btn btn-sm btn-danger" title="Copy">
+                                    <i class="bi bi-clipboard"></i>
+                                </a>
+                                </h5>
+                                
                             </div>
+
                             <hr>
                             <div class="card mt-5 p-4 shadow-sm">
                                 <div class="d-flex justify-content-between align-items-center mb-3">
@@ -129,6 +136,8 @@
 
     @include('admin_panel.include.footer_include')
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+
     <script>
         function addBillRow(id, category, variety, unit, total_units, unit_in) {
             const billTable = document.querySelector('#billTable tbody');
@@ -164,6 +173,12 @@
 
             addMazdoriRow(id, total_units, unit_in);
         }
+
+        function copyMazdori() {
+            const value = document.getElementById('totalMazdori').innerText;
+            navigator.clipboard.writeText(value).then(() => {}).catch(err => {});
+        }
+
 
         function updateRowAmount(e) {
             const id = e.target.dataset.id;
