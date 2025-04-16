@@ -314,7 +314,7 @@ class LotSaleController extends Controller
         return response()->json($data);
     }
 
-    public function Create_Bill($truck_id)
+    public function Create_Bill($truck_id, $vendor_id)
     {
         $lots = DB::table('lot_entries')
             ->where('truck_id', $truck_id)
@@ -340,8 +340,9 @@ class LotSaleController extends Controller
 
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
         $customers = Customer::orderBy('customer_name', 'asc')->get();
+        $vendor_id = $vendor_id;
 
-        return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers'));
+        return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers','vendor_id'));
     }
 
 
@@ -382,6 +383,7 @@ class LotSaleController extends Controller
         $bill = new VendorBill();
         $bill->truck_id = $request->truck_id;
         $bill->trucknumber = $request->trucknumber;
+        $bill->vendorId = $request->vendorId;
         $bill->subtotal = $request->subtotal;
         $bill->total_expense = $request->total_expense;
         $bill->net_pay = $request->net_pay;

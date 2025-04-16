@@ -115,6 +115,8 @@ Route::post('/update-supplier', [SupplierController::class, 'update_supplier'])-
 Route::get('/supplier-ledger', [SupplierController::class, 'supplier_ledger'])->middleware(['auth', 'admin'])->name('supplier-ledger');
 Route::post('/supplier-payment-store', [SupplierController::class, 'supplier_payment_store'])->name('supplier-payment-store');
 Route::get('/supplier-payment', [SupplierController::class, 'supplier_payment'])->name('supplier-payment');
+Route::get('/Supplier-balance', [SupplierController::class, 'Supplier_balance'])->middleware(['auth', 'admin'])->name('Supplier-balance');
+Route::get('/Supplier-balance-ledger/{id}', [SupplierController::class, 'Supplier_balance_ledger'])->name('Supplier-balance-ledger');
 
 //Staff
 Route::get('/staff', [StaffController::class, 'staff'])->middleware(['auth','admin'])->name('staff');
@@ -206,7 +208,7 @@ Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('tru
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
 
-Route::get('/Create-Bill/{id}', [LotSaleController::class, 'Create_Bill'])->name('Create-Bill');
+Route::get('/create-bill/{truck_id}/{vendor_id}', [LotSaleController::class, 'Create_Bill'])->name('Create-Bill');
 Route::post('/vendor-bill/store', [LotSaleController::class, 'store_Bill'])->name('vendor.bill.store');
 Route::get('/vendor-bill/view/{id}', [LotSaleController::class, 'view'])->name('view-vendor-bill');
 Route::get('/bill-book/view/{id}', [LotSaleController::class, 'bill_book'])->name('bill-book');
@@ -215,6 +217,7 @@ Route::get('/bill-book/view/{id}', [LotSaleController::class, 'bill_book'])->nam
 Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])->middleware(['auth', 'admin'])->name('Customer-balance');
 Route::get('/customer-ledger/{id}', [CustomerController::class, 'fetchLedger'])->name('customer.ledger');
 Route::get('/lot/sale/{id}', [CustomerController::class, 'getLotDetails'])->name('lot.sale.details');
+
 
 
 Route::middleware('auth')->group(function () {

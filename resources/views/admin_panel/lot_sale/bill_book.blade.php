@@ -1,5 +1,7 @@
 @include('admin_panel.include.header_include')
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Nastaliq+Urdu&display=swap" rel="stylesheet">
+
 <style>
     /* Common Table Styles */
     .main-table th,
@@ -113,6 +115,31 @@
             display: none !important;
         }
     }
+
+    @media print {
+
+        body,
+        table,
+        th,
+        td,
+        div,
+        span,
+        strong {
+            font-size: 11px !important;
+            /* smaller font */
+            line-height: 1.2 !important;
+            color: #000 !important;
+            font-family: 'Noto Nastaliq Urdu', 'Arial', sans-serif !important;
+        }
+
+        .main-table th,
+        .main-table td,
+        .expense-table th,
+        .expense-table td {
+            padding: 4px 6px !important;
+            /* smaller padding */
+        }
+    }
 </style>
 
 
@@ -155,13 +182,46 @@
                         $finals = json_decode($bill->final_amount ?? '[]');
                         @endphp
 
-                        <table class="info-table">
+                        <!-- Top Header Banner -->
+                        <div style="background-color: #FFFBD4; padding: 10px 20px; border-bottom: 2px solid #EC1E1E;">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <!-- Left Contact Info -->
+                                <div style="font-size: 12px; color: #000;">
+                                    <div><strong>Haji Alnoor</strong> - 0322-3014221</div>
+                                    <div><strong>Umair Alnoor</strong> - 0321-3022033</div>
+                                    <div><strong>Faizan Alnoor</strong> - 0321-3061917</div>
+                                    <div><strong>Ahmed Alnoor</strong> - 0311-8661606</div>
+                                </div>
+
+                                <!-- Center Title -->
+                                <div style="text-align: center;">
+                                    <div style="background-color: #EC1E1E; color: #FFEC0D; padding: 5px 15px; font-weight: bold; font-size: 24px; border-radius: 4px;">
+                                        Jan Muhammad and CO
+                                    </div>
+                                    <div style="background-color: #2E3094; color: white; padding: 5px 10px; font-size: 14px;">
+                                        Alu • Piyaz • Hari Mirch • Lassan Commission Agent
+                                    </div>
+                                    <div style="background-color: #02A64F; color: white; padding: 5px 10px; font-size: 13px;">
+                                        Shop Number 209 and 218, New Sabzi Mandi, Halanaka Hyderabad
+                                    </div>
+                                </div>
+
+                                <!-- Right Logo -->
+                                <div>
+                                    <img src="{{ asset('logo_white.png') }}" alt="Logo" style="height: 80px;">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Vendor Info Table -->
+                        <table class="info-table" style="width: 100%; margin-top: 10px;">
                             <tr>
                                 <td style="text-align: left;"><strong data-en="Vendor Name:" data-ur="وینڈر کا نام:">Vendor Name:</strong> {{ $vendorName }}</td>
                                 <td style="text-align: center;"><strong data-en="Date:" data-ur="تاریخ:">Date:</strong> {{ \Carbon\Carbon::parse($bill->created_at)->format('Y-m-d') }}</td>
                                 <td style="text-align: right;"><strong data-en="Truck No:" data-ur="ٹرک نمبر:">Truck No:</strong> {{ $bill->trucknumber }}</td>
                             </tr>
                         </table>
+
                         <div class="section-title" data-en="Lot Details" data-ur="لاٹ کی تفصیلات">Lot Details</div>
                         <div class="table-responsive">
                             <table class="main-table table table-bordered table-striped">

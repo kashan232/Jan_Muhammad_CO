@@ -17,6 +17,7 @@
                             <h4 class="fw-bold text-primary mt-4">Create Bill For Vendor (Truck: {{ $truck->truck_number }})</h4>
                             <input type="hidden" name="truck_id" value="{{ $truck->id }}">
                             <input type="hidden" name="truck_number" value="{{ $truck->truck_number }}">
+                            <input type="hidden" name="vendor_id" value="{{ $vendor_id }}">
                             <div class="table-responsive">
                                 <table class="table table-striped">
                                     <thead>
@@ -302,6 +303,8 @@
             const form = e.target;
             const truckId = form.querySelector('input[name="truck_id"]').value;
             const trucknumber = form.querySelector('input[name="truck_number"]').value;
+            const vendorId = form.querySelector('input[name="vendor_id"]').value;
+            alert(vendorId);
             const subtotal = document.getElementById('subtotal').textContent;
             const totalExpense = document.getElementById('totalExpense').textContent;
             const netPay = document.getElementById('netPay').textContent;
@@ -332,6 +335,7 @@
             const payload = {
                 truck_id: truckId,
                 trucknumber: trucknumber,
+                vendorId: vendorId,
                 subtotal: subtotal,
                 total_expense: totalExpense,
                 net_pay: netPay,
@@ -340,8 +344,6 @@
             };
 
             // 🔥 Check what’s being sent (can remove console later)
-            console.log(payload);
-
             fetch("{{ route('vendor.bill.store') }}", {
                     method: 'POST',
                     headers: {

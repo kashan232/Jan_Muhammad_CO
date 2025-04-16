@@ -158,4 +158,57 @@ class SupplierController extends Controller
             return redirect()->back();
         }
     }
+
+    public function Supplier_balance()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+            $SupplierLedger = SupplierLedger::where('admin_or_user_id', $userId)->with('supplier')->get();
+            return view('admin_panel.supplier.supplier_balance', compact('SupplierLedger'));
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function Supplier_balance_ledger($supplier_id)
+    {
+        // Step 1: Find supplier name from suppliers table
+        $supplierName = DB::table('suppliers')
+            ->where('id', $supplier_id)
+            ->pluck('name')
+            ->first();
+
+        if (!$supplierName) {
+            return response()->json(['error' => 'Supplier not found'], 404);
+        }
+
+        // Step 2: Find all vendor bills using supplier name as vendorId
+        $bills = DB::table('vendor_bills')
+            ->where('vendorId', $supplierName)
+            ->select(
+                'id',
+                'created_at as date',
+                DB::raw("'Bill' as type"),
+                'net_pay as amount',
+                DB::raw("CONCAT('Truck #: ', trucknumber) as remarks")
+            )
+            ->get();
+
+        // Step 3: Find all supplier payments
+        $payments = DB::table('supplier_payments')
+            ->where('supplier_id', $supplier_id)
+            ->select(
+                'id',
+                'payment_date as date',
+                DB::raw("'Payment' as type"),
+                'amount_paid as amount',
+                'description as remarks'
+            )
+            ->get();
+
+        // Step 4: Merge and sort all records by date
+        $merged = $bills->concat($payments)->sortByDesc('date')->values();
+
+        return response()->json($merged);
+    }
 }
