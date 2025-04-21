@@ -72,6 +72,14 @@
                                                         <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#editModal{{ $sale->id }}">
                                                             Edit
                                                         </button>
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-danger delete-sale"
+                                                            data-lot-id="{{ $sale->lot_id }}"
+                                                            data-sale-id="{{ $sale->id }}">
+                                                            Delete
+                                                        </button>
+
                                                     </td>
                                                 </tr>
 
@@ -126,3 +134,47 @@
 
     @include('admin_panel.include.footer_include')
 </body>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+    $('.delete-sale').on('click', function() {
+        const lotId = $(this).data('lot-id');
+        const saleId = $(this).data('sale-id');
+
+        Swal.fire({
+            title: 'Are you sure?',
+            text: "You want to delete this sale!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            cancelButtonColor: '#3085d6',
+            confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Send AJAX request here
+                $.ajax({
+                    url: '{{ route("delete.sale") }}',
+                    type: 'POST',
+                    data: {
+                        _token: '{{ csrf_token() }}',
+                        lot_id: lotId,
+                        sale_id: saleId
+                    },
+                    success: function(res) {
+                        Swal.fire(
+                            'Deleted!',
+                            res.message,
+                            'success'
+                        ).then(() => {
+                            location.reload();
+                        });
+                    },
+                    error: function(xhr) {
+                        let error = xhr.responseJSON?.message || 'Something went wrong!';
+                        Swal.fire('Error', error, 'error');
+                    }
+                });
+            }
+        });
+    });
+</script>

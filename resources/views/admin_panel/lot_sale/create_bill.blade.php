@@ -96,11 +96,11 @@
                             <div class="d-flex justify-content-between align-items-center mt-3">
                                 <h5 class="fw-bold mb-0">
                                     Total Mazdori: <span id="totalMazdori">0</span>
-                                    <a onclick="copyMazdori()" class="btn btn-sm btn-danger" title="Copy">
-                                    <i class="bi bi-clipboard"></i>
-                                </a>
+                                    <!-- <a onclick="copyMazdori()" class="btn btn-sm btn-danger" title="Copy">
+                                        <i class="bi bi-clipboard"></i>
+                                    </a> -->
                                 </h5>
-                                
+
                             </div>
 
                             <hr>
@@ -162,9 +162,10 @@
                 <input type="hidden" name="unit_in[${id}]" value="${unit_in}">
             </td>
             <td>${total_units}</td>
-            <td><input type="number" name="sale_units[${id}]" class="form-control sale-units" data-id="${id}" min="1" max="${total_units}" required></td>
-            <td><input type="number" name="rate[${id}]" class="form-control rate" data-id="${id}" min="1" required></td>
-            <td><input type="number" name="amount[${id}]" class="form-control amount" readonly></td>
+            <td><input type="number" name="sale_units[]" class="form-control sale-units" min="1" max="${total_units}" required></td>
+<td><input type="number" name="rate[]" class="form-control rate" min="1" required></td>
+<td><input type="number" name="amount[]" class="form-control amount" readonly></td>
+
             <td><button type="button" class="btn btn-danger btn-sm" onclick="removeBothRows(this, ${id})">Remove</button></td>
         `;
             billTable.appendChild(billRow);
@@ -182,12 +183,11 @@
 
 
         function updateRowAmount(e) {
-            const id = e.target.dataset.id;
-            const units = parseFloat(document.querySelector(`input[name="sale_units[${id}]"]`).value) || 0;
-            const rate = parseFloat(document.querySelector(`input[name="rate[${id}]"]`).value) || 0;
+            const row = e.target.closest('tr');
+            const units = parseFloat(row.querySelector('.sale-units').value) || 0;
+            const rate = parseFloat(row.querySelector('.rate').value) || 0;
             const amount = units * rate;
-
-            document.querySelector(`input[name="amount[${id}]"]`).value = Math.round(amount);
+            row.querySelector('.amount').value = Math.round(amount);
             calculateTotal();
         }
 
@@ -202,17 +202,22 @@
         }
 
         function addMazdoriRow(id, total_units, unit_in) {
+            // Check if row already exists
+            if (document.getElementById(`mazdori_row_${id}`)) {
+                return; // Already exists, don't add again
+            }
+
             const table = document.querySelector('#mazdoriTable tbody');
             const row = document.createElement('tr');
             row.setAttribute("id", `mazdori_row_${id}`);
 
             row.innerHTML = `
-            <td><input type="text" name="mazdori_unit_in[${id}]" class="form-control" value="${unit_in}" readonly></td>
-            <td><input type="number" name="mazdori_units[${id}]" class="form-control" value="${total_units}" readonly></td>
-            <td><input type="number" name="mazdori_price_per_lot[${id}]" class="form-control price-per-lot" data-id="${id}" required></td>
-            <td><input type="number" name="mazdori_total[${id}]" class="form-control mazdori-total" readonly></td>
-            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeBothRows(this, ${id})">Remove</button></td>
-        `;
+        <td><input type="text" name="mazdori_unit_in[${id}]" class="form-control" value="${unit_in}" readonly></td>
+        <td><input type="number" name="mazdori_units[${id}]" class="form-control" value="${total_units}" readonly></td>
+        <td><input type="number" name="mazdori_price_per_lot[${id}]" class="form-control price-per-lot" data-id="${id}" required></td>
+        <td><input type="number" name="mazdori_total[${id}]" class="form-control mazdori-total" readonly></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="removeBothRows(this, ${id})">Remove</button></td>
+    `;
             table.appendChild(row);
 
             row.querySelector('.price-per-lot').addEventListener('input', calculateMazdoriTotal);
@@ -279,24 +284,41 @@
         }
 
         function addExpenseRow() {
+            const totalMazdori = document.getElementById('totalMazdori').innerText || 0;
             const row = document.createElement('tr');
             row.innerHTML = `
-            <td>
-                <select class="form-control expense-type" onchange="calculateExpenses()">
-                    <option value="">Select</option>
-                    <option value="Mazdori">Mazdori</option>
-                    <option value="Commission">Commission (%)</option>
-                    <option value="Rent">Rent</option>
-                    <option value="Market Tax">Market Tax</option>
-                </select>
-            </td>
-            <td><input type="number" class="form-control expense-input" oninput="calculateExpenses()"></td>
-            <td><input type="number" class="form-control expense-final" readonly></td>
-            <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); calculateExpenses();">Remove</button></td>
-        `;
+        <td>
+            <select class="form-control expense-type" onchange="handleTypeChange(this)">
+                <option value="">Select</option>
+                <option value="Mazdori">Mazdori</option>
+                <option value="Commission">Commission (%)</option>
+                <option value="Rent">Rent</option>
+                <option value="Market Tax">Market Tax</option>
+            </select>
+        </td>
+        <td><input type="number" class="form-control expense-input" oninput="calculateExpenses()"></td>
+        <td><input type="number" class="form-control expense-final" readonly></td>
+        <td><button type="button" class="btn btn-danger btn-sm" onclick="this.closest('tr').remove(); calculateExpenses();">Remove</button></td>
+    `;
             document.querySelector('#expenseTable tbody').appendChild(row);
         }
 
+        function handleTypeChange(select) {
+            const row = select.closest('tr');
+            const input = row.querySelector('.expense-input');
+            const final = row.querySelector('.expense-final');
+
+            if (select.value === "Mazdori") {
+                const totalMazdori = parseFloat(document.getElementById('totalMazdori').innerText) || 0;
+                input.value = totalMazdori;
+                final.value = totalMazdori;
+            } else {
+                input.value = '';
+                final.value = '';
+            }
+
+            calculateExpenses();
+        }
         document.getElementById('billForm').addEventListener('submit', function(e) {
             e.preventDefault();
 
@@ -304,7 +326,6 @@
             const truckId = form.querySelector('input[name="truck_id"]').value;
             const trucknumber = form.querySelector('input[name="truck_number"]').value;
             const vendorId = form.querySelector('input[name="vendor_id"]').value;
-            alert(vendorId);
             const subtotal = document.getElementById('subtotal').textContent;
             const totalExpense = document.getElementById('totalExpense').textContent;
             const netPay = document.getElementById('netPay').textContent;
@@ -312,13 +333,12 @@
             // Collect bill details
             const bills = [];
             document.querySelectorAll('#billTable tbody tr').forEach(row => {
-                const lotId = row.querySelector('input[name^="lots"]').value;
                 bills.push({
-                    lot_id: lotId,
-                    sale_units: row.querySelector(`input[name="sale_units[${lotId}]"]`).value,
-                    rate: row.querySelector(`input[name="rate[${lotId}]"]`).value,
-                    amount: row.querySelector(`input[name="amount[${lotId}]"]`).value,
-                    unit_in: row.querySelector(`input[name="unit_in[${lotId}]"]`).value
+                    lot_id: row.querySelector('input[name^="lots"]').value,
+                    sale_units: row.querySelector('.sale-units').value,
+                    rate: row.querySelector('.rate').value,
+                    amount: row.querySelector('.amount').value,
+                    unit_in: row.querySelector('input[name^="unit_in"]').value
                 });
             });
 
@@ -343,7 +363,6 @@
                 expenses: expenses
             };
 
-            // 🔥 Check what’s being sent (can remove console later)
             fetch("{{ route('vendor.bill.store') }}", {
                     method: 'POST',
                     headers: {
@@ -355,12 +374,23 @@
                 .then(response => response.json())
                 .then(data => {
                     console.log(data);
-                    Swal.fire('Success', 'Bill has been saved!', 'success');
+
+                    if (data.success) {
+                        Swal.fire('Success', data.message, 'success').then(() => {
+                            setTimeout(() => {
+                                window.location.href = "{{ route('trucks-sold') }}"; // 👈 Replace with your actual route
+                            }, 3000); // 5 seconds
+                        });
+                    } else {
+                        Swal.fire('Error', data.message, 'error');
+                    }
                 })
                 .catch(error => {
                     console.error(error);
-                    Swal.fire('Error', 'Something went wrong!', 'error');
+                    Swal.fire('Error', 'Something went wrong with the request.', 'error');
                 });
+
+
         });
     </script>
 </body>

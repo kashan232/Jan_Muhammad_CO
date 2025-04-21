@@ -173,10 +173,11 @@ class LotSaleController extends Controller
                 ->where('lot_sales.lot_id', $lot->id)
                 ->select(
                     'lot_sales.id',
+                    'lot_sales.lot_id', // <-- 👈 Add this line
                     DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"),
                     DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"),
                     'lot_sales.quantity',
-                    'lot_sales.weight', // Add this
+                    'lot_sales.weight',
                     'lot_sales.price',
                     'lot_sales.total',
                     'lot_sales.sale_date',
@@ -201,9 +202,35 @@ class LotSaleController extends Controller
 
         return back()->with('success', 'Sale record updated successfully!');
     }
+    public function deleteSale(Request $request)
+    {
+        $lot_id = $request->lot_id;
+        $sale_id = $request->sale_id;
 
+        // 1. Get the sale record
+        $sale = DB::table('lot_sales')->where('id', $sale_id)->first();
+        if (!$sale) {
+            return response()->json(['message' => 'Sale not found.'], 404);
+        }
 
+        // 2. Get the related lot
+        $lot = DB::table('lot_entries')->where('id', $lot_id)->first();
+        if (!$lot) {
+            return response()->json(['message' => 'Lot not found.'], 404);
+        }
 
+        // 3. Add the deleted quantity back to lot_quantity
+        $newQuantity = $lot->lot_quantity + $sale->quantity;
+
+        DB::table('lot_entries')->where('id', $lot_id)->update([
+            'lot_quantity' => $newQuantity,
+        ]);
+
+        // 4. Delete the sale record
+        DB::table('lot_sales')->where('id', $sale_id)->delete();
+
+        return response()->json(['message' => 'Sale deleted and quantity added back to lot.']);
+    }
 
 
 
@@ -342,7 +369,7 @@ class LotSaleController extends Controller
         $customers = Customer::orderBy('customer_name', 'asc')->get();
         $vendor_id = $vendor_id;
 
-        return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers','vendor_id'));
+        return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers', 'vendor_id'));
     }
 
 
@@ -353,6 +380,7 @@ class LotSaleController extends Controller
         if (!$truckEntry) {
             return response()->json(['success' => false, 'message' => 'Truck not found'], 404);
         }
+
         // Step 2: TruckEntry se vendor name lo
         $vendorName = $truckEntry->vendor_id; // assuming vendor_id is actually name
 
@@ -379,6 +407,38 @@ class LotSaleController extends Controller
             ]);
         }
 
+        // ✅ Step 6: Lot validation
+        $lotSaleTotals = [];
+
+        foreach ($request->bill_details as $detail) {
+            $lotId = $detail['lot_id'];
+            $saleUnits = $detail['sale_units'];
+
+            if (!isset($lotSaleTotals[$lotId])) {
+                $lotSaleTotals[$lotId] = 0;
+            }
+
+            $lotSaleTotals[$lotId] += $saleUnits;
+        }
+
+        foreach ($lotSaleTotals as $lotId => $totalSaleUnits) {
+            $lotEntry = LotEntry::find($lotId);
+
+            if (!$lotEntry) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Lot ID $lotId not found."
+                ], 404);
+            }
+
+            if ($totalSaleUnits > $lotEntry->total_units) {
+                return response()->json([
+                    'success' => false,
+                    'message' => "Lot $lotId has only {$lotEntry->total_units} units available. You are trying to bill $totalSaleUnits units."
+                ], 400);
+            }
+        }
+
         // ✅ Save Bill
         $bill = new VendorBill();
         $bill->truck_id = $request->truck_id;
@@ -403,6 +463,7 @@ class LotSaleController extends Controller
         return response()->json(['success' => true, 'message' => 'Vendor bill saved and ledger updated.']);
     }
 
+
     public function view($id)
     {
         $bill = VendorBill::findOrFail($id);
@@ -413,32 +474,28 @@ class LotSaleController extends Controller
     {
         $bill = VendorBill::find($id);
 
-        // Truck entry find using truck_id
         $truckEntry = TruckEntry::where('id', $bill->truck_id)->first();
-
-        // Vendor name
         $vendorName = $truckEntry->vendor_id ?? 'N/A';
 
-        // Get lot_ids (JSON to array)
-        $lot_ids = json_decode($bill->lot_id, true); // ["1","2"]
+        // Decode full array (not unique)
+        $lot_ids = json_decode($bill->lot_id, true);
+        $sale_units = json_decode($bill->sale_units, true);
+        $rates = json_decode($bill->rate, true);
+        $amounts = json_decode($bill->amount, true);
+        $units_in = json_decode($bill->unit_in, true);
 
-        // Get entries for those lot_ids
-        $lotEntries = LotEntry::whereIn('id', $lot_ids)->get();
-
-        // Separate arrays for each field
-        $lotcategories = $lotEntries->pluck('category')->toArray();
-        $varieties = $lotEntries->pluck('variety')->toArray();
-        $units = $lotEntries->pluck('unit')->toArray();
-        $units_in = $lotEntries->pluck('unit_in')->toArray();
+        // Get LotEntry mapping by id
+        $lotEntries = LotEntry::whereIn('id', $lot_ids)->get()->keyBy('id');
 
         return view('admin_panel.lot_sale.bill_book', compact(
             'bill',
             'vendorName',
             'lot_ids',
-            'lotcategories',
-            'varieties',
-            'units',
-            'units_in'
+            'sale_units',
+            'rates',
+            'amounts',
+            'units_in',
+            'lotEntries'
         ));
     }
 }

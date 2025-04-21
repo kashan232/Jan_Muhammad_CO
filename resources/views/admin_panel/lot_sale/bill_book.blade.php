@@ -63,6 +63,22 @@
         margin-bottom: 20px;
     }
 
+    @media print {
+        .contact-info {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 2px !important;
+            font-size: 11px !important;
+        }
+
+        .contact-info div {
+            text-align: left !important;
+            padding-left: 0 !important;
+            margin: 0 !important;
+        }
+    }
+
+
     /* PRINT STYLES */
     @media print {
 
@@ -183,18 +199,19 @@
                         @endphp
 
                         <!-- Top Header Banner -->
-                        <div style="background-color: #FFFBD4; padding: 10px 20px; border-bottom: 2px solid #EC1E1E;">
-                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <div class="top-header" style="background-color: #FFFBD4; padding: 10px 20px; border-bottom: 2px solid #EC1E1E;">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+
                                 <!-- Left Contact Info -->
-                                <div style="font-size: 12px; color: #000;">
-                                    <div><strong>Haji Alnoor</strong> - 0322-3014221</div>
-                                    <div><strong>Umair Alnoor</strong> - 0321-3022033</div>
-                                    <div><strong>Faizan Alnoor</strong> - 0321-3061917</div>
-                                    <div><strong>Ahmed Alnoor</strong> - 0311-8661606</div>
+                                <div class="contact-info" style="font-size: 12px; color: #000; display: flex; flex-direction: column; gap: 2px; min-width: 200px;">
+                                    <div style="text-align: left;"><strong>Haji Anwar</strong> - 0322-3014221</div>
+                                    <div style="text-align: left;"><strong>Umair Anwar</strong> - 0321-3022033</div>
+                                    <div style="text-align: left;"><strong>Faizan Anwar</strong> - 0321-3061917</div>
+                                    <div style="text-align: left;"><strong>Ahmed Anwar</strong> - 0311-8661606</div>
                                 </div>
 
                                 <!-- Center Title -->
-                                <div style="text-align: center;">
+                                <div class="center-title" style="text-align: center;">
                                     <div style="background-color: #EC1E1E; color: #FFEC0D; padding: 5px 15px; font-weight: bold; font-size: 24px; border-radius: 4px;">
                                         Jan Muhammad and CO
                                     </div>
@@ -213,11 +230,12 @@
                             </div>
                         </div>
 
+
                         <!-- Vendor Info Table -->
                         <table class="info-table" style="width: 100%; margin-top: 10px;">
                             <tr>
-                                <td style="text-align: left;"><strong data-en="Vendor Name:" data-ur="وینڈر کا نام:">Vendor Name:</strong> {{ $vendorName }}</td>
-                                <td style="text-align: center;"><strong data-en="Date:" data-ur="تاریخ:">Date:</strong> {{ \Carbon\Carbon::parse($bill->created_at)->format('Y-m-d') }}</td>
+                                <td style="text-align: left;"><strong data-en="Date:" data-ur="تاریخ:">Date:</strong> {{ \Carbon\Carbon::parse($bill->created_at)->format('Y-m-d') }}</td>
+                                <td style="text-align: ;"><strong data-en="Vendor Name:" data-ur="وینڈر کا نام:">Vendor Name:</strong> {{ $vendorName }}</td>
                                 <td style="text-align: right;"><strong data-en="Truck No:" data-ur="ٹرک نمبر:">Truck No:</strong> {{ $bill->trucknumber }}</td>
                             </tr>
                         </table>
@@ -238,21 +256,23 @@
                                 </thead>
                                 <tbody>
                                     @php $totalSaleUnits = 0; @endphp
-                                    @foreach ($lot_ids as $index => $lot)
+                                    @foreach ($lot_ids as $index => $lotId)
                                     @php
                                     $unit = (int)($sale_units[$index] ?? 0);
                                     $totalSaleUnits += $unit;
+                                    $lot = $lotEntries[$lotId] ?? null;
                                     @endphp
                                     <tr>
                                         <td>{{ $unit }}</td>
                                         <td>{{ $units_in[$index] ?? '' }}</td>
-                                        <td>{{ $lotcategories[$index] ?? '' }}</td>
-                                        <td>{{ $varieties[$index] ?? '' }}</td>
-                                        <td>{{ $units[$index] ?? '' }}</td>
+                                        <td>{{ $lot->category ?? '' }}</td>
+                                        <td>{{ $lot->variety ?? '' }}</td>
+                                        <td>{{ $lot->unit ?? '' }}</td>
                                         <td>{{ number_format($rates[$index] ?? 0) }}</td>
                                         <td>{{ number_format($amounts[$index] ?? 0) }}</td>
                                     </tr>
                                     @endforeach
+
                                     <tr class="lot-total-row">
                                         <td style="text-align: center;" data-en="Total Lots:" data-ur="کل لاٹس:">
                                             Total Lots: {{ number_format($totalSaleUnits) }}
@@ -260,16 +280,20 @@
                                         <td colspan="5" style="text-align: right;" data-en="Total" data-ur="کل">Total</td>
                                         <td>{{ number_format($bill->subtotal) }}</td>
                                     </tr>
-                                    <tr class="expense-total-row">
-                                        <td colspan="6" style="text-align: right;" data-en="Total Expenses" data-ur="کل اخراجات">Total Expenses</td>
-                                        <td>{{ number_format($bill->total_expense) }}</td>
-                                    </tr>
-                                    <tr class="net-row">
-                                        <td colspan="6" style="text-align: right;" data-en="Net Amount" data-ur="خالص رقم">Net Amount</td>
-                                        <td>{{ number_format($bill->net_pay) }}</td>
-                                    </tr>
                                 </tbody>
                             </table>
+                        </div>
+
+                        {{-- Total Expenses and Net Amount outside the table --}}
+                        <div class="row mt-4">
+                            <div class="col-md-12">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <p><strong data-en="Total Expenses" data-ur="کل اخراجات">Total Expenses:</strong> {{ number_format($bill->total_expense) }}</p>
+                                        <p><strong data-en="Net Amount" data-ur="خالص رقم">Net Amount:</strong> {{ number_format($bill->net_pay) }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         <div class="d-flex justify-content-end mt-3">
                             <table class="expense-table table table-bordered" style="width: auto;">

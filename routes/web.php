@@ -198,6 +198,8 @@ Route::get('/show-Lots/{id}', [LotSaleController::class, 'show_Lots'])->name('sh
 Route::post('/lot-sale', [LotSaleController::class, 'store_lot'])->name('lot.sale.store');
 Route::get('/sale-record/{truck_id}', [LotSaleController::class, 'showSaleRecord'])->name('sale-record');
 Route::post('/update-lot-sale', [LotSaleController::class, 'updateLotSale'])->name('update.lot.sale');
+Route::post('/delete-lot-sale', [LotSaleController::class, 'deleteSale'])->name('delete.sale');
+
 
 Route::get('/cash-sale', [LotSaleController::class, 'cash_sale'])->middleware(['auth', 'admin'])->name('cash-sale');
 Route::get('/daily-sale', [LotSaleController::class, 'daily_sale'])->middleware(['auth', 'admin'])->name('daily-sale');
