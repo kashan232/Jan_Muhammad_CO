@@ -121,7 +121,7 @@
                                                     Add to Sale
                                                 </button>
                                                 @else
-                                                
+
                                                 <span class="btn btn-danger text-white btn-sm">Out of Stock</span>
                                                 @endif
 
@@ -329,9 +329,10 @@
                             title: "Success!",
                             text: data.message,
                             icon: "success",
-                            confirmButtonText: "OK"
+                            showConfirmButton: false,
+                            timer: 2000
                         }).then(() => {
-                            location.reload(); // Page reload after user clicks OK
+                            window.location.href = "{{ route('show-trucks') }}";
                         });
                     } else {
                         Swal.fire({

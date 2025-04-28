@@ -124,6 +124,16 @@
 
                                 <h5 class="mt-3 fw-bold">Total Expenses: <span id="totalExpense">0</span></h5>
                                 <h4 class="mt-3 fw-bold text-success">Net Pay to Vendor: <span id="netPay">0</span></h4>
+                                <input type="hidden" name="net_pay_to_vendor" id="net_pay_to_vendor">
+                                <div class="d-flex align-items-center gap-2">
+                                    <select id="adjustment_type" class="form-control" style="width: 80px;" onchange="calculateExpenses()">
+                                        <option value="+">+</option>
+                                        <option value="-">-</option>
+                                    </select>
+                                    <input type="number" id="adjustment" class="form-control" oninput="calculateExpenses()" placeholder="Adjustment" style="max-width: 150px;">
+                                </div>
+
+
                             </div>
 
                             <button type="submit" class="btn btn-primary" id="submitBill">Save Bill</button>
@@ -253,25 +263,41 @@
 
         function calculateExpenses() {
             const subtotal = parseFloat(document.getElementById('subtotal').textContent) || 0;
+            const totalMazdori = parseFloat(document.getElementById('totalMazdori').textContent) || 0;
+            let adjustmentRaw = document.getElementById('adjustment').value;
+            let adjustmentValue = adjustmentRaw === '' ? null : parseFloat(adjustmentRaw);
+            const adjustmentType = document.getElementById('adjustment_type').value;
+
+            if (adjustmentType === '-') {
+                adjustmentValue = -adjustmentValue;
+            }
+
             let totalExpense = 0;
+            let commissionAmount = 0;
 
             document.querySelectorAll('#expenseTable tbody tr').forEach(row => {
                 const type = row.querySelector('.expense-type').value;
                 const value = parseFloat(row.querySelector('.expense-input').value) || 0;
+
                 let final = 0;
 
                 if (type === 'Commission') {
-                    final = subtotal * (value / 100);
+                    commissionAmount = subtotal * (value / 100);
+                    final = commissionAmount;
                 } else {
                     final = value;
+                    totalExpense += final;
                 }
 
                 row.querySelector('.expense-final').value = Math.round(final);
-                totalExpense += final;
             });
 
             document.getElementById('totalExpense').textContent = Math.round(totalExpense);
-            document.getElementById('netPay').textContent = Math.round(subtotal - totalExpense);
+
+            const netPay = subtotal - totalMazdori - totalExpense + (adjustmentValue ?? 0) - commissionAmount;
+
+            document.getElementById('netPay').textContent = Math.round(netPay);
+            document.getElementById('net_pay_to_vendor').value = Math.round(netPay);
         }
 
         function validateBill() {
@@ -329,6 +355,8 @@
             const subtotal = document.getElementById('subtotal').textContent;
             const totalExpense = document.getElementById('totalExpense').textContent;
             const netPay = document.getElementById('netPay').textContent;
+            const adjustmentInput = document.getElementById('adjustment');
+            const adjustment = adjustmentInput.value === '' ? null : parseFloat(adjustmentInput.value);
 
             // Collect bill details
             const bills = [];
@@ -359,6 +387,7 @@
                 subtotal: subtotal,
                 total_expense: totalExpense,
                 net_pay: netPay,
+                adjustment: adjustment,
                 bill_details: bills,
                 expenses: expenses
             };

@@ -46,6 +46,7 @@
                                             <tr>
                                                 <th>S.N.</th>
                                                 <th>Name</th>
+                                                <th>Urdu Name</th>
                                                 <th>Phone</th>
                                                 <th>City | Area</th>
                                                 <th>Opening Balance</th>
@@ -57,14 +58,27 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $Customer->customer_name }}</td>
+                                                <td>{{ $Customer->customer_name_urdu }}</td>
                                                 <td>{{ $Customer->customer_phone }}</td>
                                                 <td>{{ $Customer->city }}<br>{{ $Customer->area }}</td>
                                                 <td>{{ $Customer->opening_balance }}</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editcustomerbtn" data-toggle="modal" data-target="#exampleModal" data-customer-id="{{ $Customer->id }}" data-customer-name="{{ $Customer->customer_name }}"
-                                                            data-customer-city="{{ $Customer->city }}" data-customer-area="{{ $Customer->area }}" data-customer-phone="{{ $Customer->customer_phone }}" data-opening-balance="{{ $Customer->opening_balance }}">
-                                                            <i class="la la-pencil"></i>Edit </button>
+                                                        <button
+                                                            type="button"
+                                                            class="btn btn-sm btn-outline--primary editcustomerbtn"
+                                                            data-toggle="modal"
+                                                            data-target="#exampleModal"
+                                                            data-customer-id="{{ $Customer->id }}"
+                                                            data-customer-name="{{ $Customer->customer_name }}"
+                                                            data-customer-urdu="{{ $Customer->customer_name_urdu }}"
+                                                            data-customer-city="{{ $Customer->city }}"
+                                                            data-customer-area="{{ $Customer->area }}"
+                                                            data-customer-phone="{{ $Customer->customer_phone }}"
+                                                            data-opening-balance="{{ $Customer->opening_balance }}">
+                                                            <i class="la la-pencil"></i>Edit
+                                                        </button>
+
                                                     </div>
                                                 </td>
                                             </tr>
@@ -93,6 +107,10 @@
                                     <div class="form-group">
                                         <label>Name</label>
                                         <input type="text" class="form-control" name="customer_name" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Urdu Name</label> <!-- Add this -->
+                                        <input type="text" class="form-control" name="customer_name_urdu">
                                     </div>
                                     <div class="form-group">
                                         <label>Mobile</label>
@@ -138,6 +156,11 @@
                                     </div>
 
                                     <div class="form-group">
+                                        <label>Urdu Name</label> <!-- Add this -->
+                                        <input type="text" class="form-control" id="edit_customer_name_urdu" name="customer_name_urdu">
+                                    </div>
+
+                                    <div class="form-group">
                                         <label>Mobile</label>
                                         <input type="text" class="form-control" id="edit_customer_phone" name="customer_phone">
                                     </div>
@@ -180,6 +203,7 @@
                 var customercity = $(this).data('customer-city');
                 var customerarea = $(this).data('customer-area');
                 var customeropeningbalance = $(this).data('opening-balance');
+                var customerurdu = $(this).data('customer-urdu');
 
                 $('#customer_id').val(customerId);
                 $('#edit_customer_name').val(customername);
@@ -188,8 +212,7 @@
                 $('#edit_customer_phone').val(customerphone);
                 $('#edit_customer_address').val(customeraddress);
                 $('#edit_opening_balance').val(customeropeningbalance);
-
+$('#edit_customer_name_urdu').val(customerurdu);
             });
         });
     </script>
-    

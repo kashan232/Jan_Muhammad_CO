@@ -94,7 +94,6 @@ class LotSaleController extends Controller
 
         foreach ($request->sales as $sale) {
             $lot = LotEntry::findOrFail($sale['lot_id']);
-
             // **Available Quantity Check**
             if ($sale['quantity'] > $lot->lot_quantity) {
                 return response()->json([
@@ -173,6 +172,7 @@ class LotSaleController extends Controller
                 ->where('lot_sales.lot_id', $lot->id)
                 ->select(
                     'lot_sales.id',
+                    'lot_sales.customer_id',
                     'lot_sales.lot_id', // <-- 👈 Add this line
                     DB::raw("COALESCE(customers.customer_name, 'Cash Sale') as customer_name"),
                     DB::raw("COALESCE(customers.customer_phone, '-') as customer_phone"),
@@ -206,6 +206,7 @@ class LotSaleController extends Controller
     {
         $lot_id = $request->lot_id;
         $sale_id = $request->sale_id;
+        $customer_id = $request->customerid;
 
         // 1. Get the sale record
         $sale = DB::table('lot_sales')->where('id', $sale_id)->first();
@@ -221,16 +222,27 @@ class LotSaleController extends Controller
 
         // 3. Add the deleted quantity back to lot_quantity
         $newQuantity = $lot->lot_quantity + $sale->quantity;
-
         DB::table('lot_entries')->where('id', $lot_id)->update([
             'lot_quantity' => $newQuantity,
         ]);
 
-        // 4. Delete the sale record
+        // 4. Adjust customer closing balance
+        $ledger = DB::table('customer_ledgers')->where('customer_id', $customer_id)->first();
+
+        if ($ledger) {
+            $newBalance = $ledger->closing_balance - $sale->total;
+
+            DB::table('customer_ledgers')->where('customer_id', $customer_id)->update([
+                'closing_balance' => $newBalance,
+            ]);
+        }
+
+        // 5. Delete the sale record
         DB::table('lot_sales')->where('id', $sale_id)->delete();
 
-        return response()->json(['message' => 'Sale deleted and quantity added back to lot.']);
+        return response()->json(['message' => 'Sale deleted, quantity restored, and balance adjusted.']);
     }
+
 
 
 
@@ -438,7 +450,8 @@ class LotSaleController extends Controller
                 ], 400);
             }
         }
-
+        $adjustment = $request->input('adjustment');
+        $netPayToVendor = $request->input('net_pay');
         // ✅ Save Bill
         $bill = new VendorBill();
         $bill->truck_id = $request->truck_id;
@@ -446,7 +459,8 @@ class LotSaleController extends Controller
         $bill->vendorId = $request->vendorId;
         $bill->subtotal = $request->subtotal;
         $bill->total_expense = $request->total_expense;
-        $bill->net_pay = $request->net_pay;
+        $bill->adjustment = $adjustment;
+        $bill->net_pay = $netPayToVendor;
 
         $bill->lot_id = json_encode(array_column($request->bill_details, 'lot_id'));
         $bill->sale_units = json_encode(array_column($request->bill_details, 'sale_units'));
@@ -475,17 +489,54 @@ class LotSaleController extends Controller
         $bill = VendorBill::find($id);
 
         $truckEntry = TruckEntry::where('id', $bill->truck_id)->first();
-        $vendorName = $truckEntry->vendor_id ?? 'N/A';
 
-        // Decode full array (not unique)
+        // نیا کوڈ: vendor ka urdu name nikalna
+        $vendorName = 'N/A';
+        if ($truckEntry && $truckEntry->vendor_id) {
+            $supplier = \App\Models\Supplier::where('name', $truckEntry->vendor_id)->first();
+            if ($supplier) {
+                $vendorName = $supplier->urdu_name ?? $supplier->name; // اگر اردو نہ ہو تو انگلش نیم
+            }
+        }
+
         $lot_ids = json_decode($bill->lot_id, true);
         $sale_units = json_decode($bill->sale_units, true);
         $rates = json_decode($bill->rate, true);
         $amounts = json_decode($bill->amount, true);
         $units_in = json_decode($bill->unit_in, true);
+        $categories = json_decode($bill->category ?? '[]');
 
-        // Get LotEntry mapping by id
-        $lotEntries = LotEntry::whereIn('id', $lot_ids)->get()->keyBy('id');
+        // Translation maps
+        $unitMap = \App\Models\Unit::pluck('unit_urdu', 'unit')->toArray();
+        $unitInMap = \App\Models\UnitIn::pluck('unit_in_urdu', 'unit_in')->toArray();
+        $categoryMap = \App\Models\Category::pluck('category_urdu', 'category')->toArray();
+        $varietyMap = \App\Models\Brand::pluck('brand_urdu', 'brand')->toArray();
+
+        // Custom categories
+        $customCategoryMap = [
+            'Mazdori' => 'مزدوری',
+            'Commission' => 'کمیشن',
+            'Rent' => 'کرایہ',
+            'Market Tax' => 'مارکیٹ ٹیکس',
+        ];
+
+        $categories_ur = collect($categories)->map(function ($item) use ($customCategoryMap) {
+            return $customCategoryMap[$item] ?? $item;
+        });
+
+        $lotEntries = LotEntry::whereIn('id', $lot_ids)->get()->mapWithKeys(function ($item) use ($unitMap, $categoryMap, $varietyMap, $unitInMap) {
+            return [
+                $item->id => (object)[
+                    'category' => $item->category,
+                    'variety' => $item->variety,
+                    'unit' => $item->unit,
+                    'category_ur' => $categoryMap[$item->category] ?? $item->category,
+                    'variety_ur' => $varietyMap[$item->variety] ?? $item->variety,
+                    'unit_ur' => $unitMap[$item->unit] ?? $item->unit,
+                    'unit_in_ur' => $unitInMap[$item->unit_in] ?? $item->unit_in,
+                ],
+            ];
+        });
 
         return view('admin_panel.lot_sale.bill_book', compact(
             'bill',
@@ -495,7 +546,9 @@ class LotSaleController extends Controller
             'rates',
             'amounts',
             'units_in',
-            'lotEntries'
+            'lotEntries',
+            'categories',
+            'categories_ur'
         ));
     }
 }

@@ -14,10 +14,10 @@ class UnitController extends Controller
         if (Auth::id()) {
             $userId = Auth::id();
             $all_unit = Unit::get();
-                // ->map(function ($Unit) {
-                //     $Unit->products_count = $Unit->products()->count();
-                //     return $Unit;
-                // });
+            // ->map(function ($Unit) {
+            //     $Unit->products_count = $Unit->products()->count();
+            //     return $Unit;
+            // });
             return view('admin_panel.unit.unit', [
                 'all_unit' => $all_unit
             ]);
@@ -28,13 +28,13 @@ class UnitController extends Controller
     public function store_unit(Request $request)
     {
         if (Auth::id()) {
-            $usertype = Auth()->user()->usertype;
             $userId = Auth::id();
             Unit::create([
-                'admin_or_user_id'    => $userId,
-                'unit'          => $request->unit,
-                'created_at'        => Carbon::now(),
-                'updated_at'        => Carbon::now(),
+                'admin_or_user_id' => $userId,
+                'unit' => $request->unit,
+                'unit_urdu' => $request->unit_urdu, // Save Urdu name
+                'created_at' => Carbon::now(),
+                'updated_at' => Carbon::now(),
             ]);
             return redirect()->back()->with('success', 'Unit Added Successfully');
         } else {
@@ -44,17 +44,17 @@ class UnitController extends Controller
     public function update_unit(Request $request)
     {
         if (Auth::id()) {
-            $usertype = Auth()->user()->usertype;
-            $userId = Auth::id();
-            // dd($reques   t);
             $update_id = $request->input('unit_id');
             $unit = $request->input('unit_name');
+            $unit_urdu = $request->input('unit_urdu'); // Get Urdu name
 
             Unit::where('id', $update_id)->update([
-                'unit'   => $unit,
+                'unit' => $unit,
+                'unit_urdu' => $unit_urdu, // Update Urdu name
                 'updated_at' => Carbon::now(),
             ]);
-            return redirect()->back()->with('success', 'unit Updated Successfully');
+
+            return redirect()->back()->with('success', 'Unit Updated Successfully');
         } else {
             return redirect()->back();
         }

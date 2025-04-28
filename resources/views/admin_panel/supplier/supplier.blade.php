@@ -39,6 +39,7 @@
                                             <tr>
                                                 <th>S.N.</th>
                                                 <th>Name</th>
+                                                <th>Urdu Name</th>
                                                 <th>Mobile</th>
                                                 <th>Payable</th>
                                                 <th>Receivable</th>
@@ -50,6 +51,7 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $Supplier->name }}</td>
+                                                <td>{{ $Supplier->urdu_name }}</td>
                                                 <td>
                                                     <span class="fw-bold"> {{ $Supplier->mobile }} </span><br> <a href="#" class="__cf_email__">{{ $Supplier->email }}</a>
                                                 </td>
@@ -57,8 +59,17 @@
                                                 <td>0</td>
                                                 <td>
                                                     <div class="button--group">
-                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal" data-supplier-id="{{ $Supplier->id }}" data-supplier-name="{{ $Supplier->name }}" data-supplier-mobile="{{ $Supplier->mobile }}" data-city="{{ $Supplier->city }}" data-area="{{ $Supplier->area }}">
-                                                            <i class="la la-pencil"></i>Edit </button>
+                                                        <button type="button"
+                                                            class="btn btn-sm btn-outline--primary editCategoryBtn"
+                                                            data-toggle="modal" data-target="#exampleModal"
+                                                            data-supplier-id="{{ $Supplier->id }}"
+                                                            data-supplier-name="{{ $Supplier->name }}"
+                                                            data-supplier-mobile="{{ $Supplier->mobile }}"
+                                                            data-city="{{ $Supplier->city }}"
+                                                            data-area="{{ $Supplier->area }}"
+                                                            data-supplier-urdu="{{ $Supplier->urdu_name }}">
+                                                            <i class="la la-pencil"></i>Edit
+                                                        </button>
                                                     </div>
                                                 </td>
                                             </tr>
@@ -88,6 +99,12 @@
                                             <div class="form-group">
                                                 <label>Name</label>
                                                 <input type="text" name="name" class="form-control" autocomplete="off" value="" required>
+                                            </div>
+                                        </div>
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Urdu Name</label>
+                                                <input type="text" name="urdu_name" class="form-control" autocomplete="off">
                                             </div>
                                         </div>
                                         <div class="col-lg-6">
@@ -148,7 +165,12 @@
                                                 <input type="text" name="name" id="suplier_name" class="form-control" autocomplete="off">
                                             </div>
                                         </div>
-
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Urdu Name</label>
+                                                <input type="text" name="urdu_name" id="supplier_urdu_name" class="form-control" autocomplete="off">
+                                            </div>
+                                        </div>
                                         <div class="col-lg-6">
                                             <div class="form-group">
                                                 <label class="form-label">Mobile <i class="fa fa-info-circle text--primary" title="Type the mobile number including the country code. Otherwise, SMS won't send to that number.">
@@ -202,11 +224,16 @@
                 var suppliermobile = $(this).data('supplier-mobile');
                 var suppliercity = $(this).data('city');
                 var supplierarea = $(this).data('area');
+                var supplierurdu = $(this).data('supplier-urdu');
+
+
                 $('#supplier_id').val(supplierId);
                 $('#suplier_name').val(suppliername);
                 $('#suplier_mobile').val(suppliermobile);
                 $('#sup_city').val(suppliercity);
                 $('#sup_area').val(supplierarea);
+                $('#supplier_urdu_name').val(supplierurdu);
+
             });
         });
     </script>

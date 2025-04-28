@@ -76,7 +76,8 @@
                                                             type="button"
                                                             class="btn btn-danger delete-sale"
                                                             data-lot-id="{{ $sale->lot_id }}"
-                                                            data-sale-id="{{ $sale->id }}">
+                                                            data-sale-id="{{ $sale->id }}"
+                                                            data-customer-id="{{ $sale->customer_id }}">
                                                             Delete
                                                         </button>
 
@@ -140,6 +141,7 @@
     $('.delete-sale').on('click', function() {
         const lotId = $(this).data('lot-id');
         const saleId = $(this).data('sale-id');
+        const customerid = $(this).data('customer-id');
 
         Swal.fire({
             title: 'Are you sure?',
@@ -158,7 +160,8 @@
                     data: {
                         _token: '{{ csrf_token() }}',
                         lot_id: lotId,
-                        sale_id: saleId
+                        sale_id: saleId,
+                        customerid: customerid
                     },
                     success: function(res) {
                         Swal.fire(

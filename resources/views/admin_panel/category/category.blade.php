@@ -39,6 +39,7 @@
                                             <tr>
                                                 <th>S.N.</th>
                                                 <th>Name</th>
+                                                <th>Urdu</th>
                                                 <th>Products</th>
                                                 <th>Action</th>
                                             </tr>
@@ -48,26 +49,20 @@
                                             <tr>
                                                 <td>{{ $loop->iteration }}</td>
                                                 <td>{{ $categories->category }}</td>
+                                                <td>{{ $categories->category_urdu ?? '-' }}</td>
                                                 <td>{{ $categories->products_count }}</td>
                                                 <td>
                                                     <div class="button--group">
 
-                                                        {{-- <button type="button"
-                                                            class="btn btn-sm btn-outline-primary cuModalBtn"
-                                                            data-modal_title="Edit Category">
-                                                            <i class="la la-pencil"></i>Edit </button> --}}
-
-                                                        <button type="button" class="btn btn-sm btn-outline-primary editCategoryBtn" data-toggle="modal"
-                                                            data-target="#editcategory" data-category-id="{{ $categories->id }}" data-category-name="{{ $categories->category }}">
+                                                        <button type="button" class="btn btn-sm btn-outline-primary editCategoryBtn"
+                                                            data-toggle="modal"
+                                                            data-target="#editcategory"
+                                                            data-category-id="{{ $categories->id }}"
+                                                            data-category-name="{{ $categories->category }}"
+                                                            data-category-urdu="{{ $categories->category_urdu }}">
                                                             <i class="la la-pencil"></i>Edit
                                                         </button>
 
-
-                                                        {{-- <button type="button"
-                                                            class="btn btn-sm btn-outline-danger  disabled  confirmationBtn"
-                                                            data-question="Are you sure to delete this category?"
-                                                            data-action="https://script.viserlab.com/torylab/admin/category/delete/6">
-                                                            <i class="la la-trash"></i>Delete </button> --}}
                                                     </div>
                                                 </td>
                                             </tr>
@@ -96,9 +91,15 @@
                                 <div class="modal-body">
 
                                     <div class="form-group">
-                                        <label>Name</label>
+                                        <label>Name (English)</label>
                                         <input type="text" name="category" class="form-control" required>
                                     </div>
+
+                                    <div class="form-group">
+                                        <label>Name (Urdu)</label>
+                                        <input type="text" name="category_urdu" class="form-control" required>
+                                    </div>
+
                                 </div>
                                 <div class="modal-footer">
                                     <button type="submit" class="btn btn--primary h-45 w-100">Submit</button>
@@ -121,9 +122,17 @@
                                 @csrf
                                 <div class="modal-body">
                                     <div class="form-group">
-                                        <label>Name</label>
-                                        <input type="text" id="editCategoryId" name="category_id" class="form-control" required>
-                                        <input type="text" id="editCategoryName" name="category_name" class="form-control">
+                                        <input type="hidden" id="editCategoryId" name="category_id" class="form-control" required>
+
+                                        <div class="form-group">
+                                            <label>Name (English)</label>
+                                            <input type="text" id="editCategoryName" name="category_name" class="form-control" required>
+                                        </div>
+
+                                        <div class="form-group">
+                                            <label>Name (Urdu)</label>
+                                            <input type="text" id="editCategoryUrdu" name="category_urdu" class="form-control" placeholder="Urdu Name" required>
+                                        </div>
                                     </div>
                                 </div>
 
@@ -134,78 +143,6 @@
                         </div>
                     </div>
                 </div>
-
-
-
-                <div class="modal fade" id="importModal" tabindex="-1" role="dialog">
-                    <div class="modal-dialog modal-lg">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h4 class="modal-title">Import Category</h4>
-                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <i class="la la-times" aria-hidden="true"></i>
-                                </button>
-                            </div>
-                            <form method="post" action="https://script.viserlab.com/torylab/admin/category/import" id="importForm" enctype="multipart/form-data">
-                                <input type="hidden" name="_token" value="zv105s8kd1s2nyZ6nvoqU6pROYAnsCPYkYXTDlWn">
-                                <div class="modal-body">
-                                    <div class="form-group">
-                                        <div class="alert alert-warning p-3" role="alert">
-                                            <p>
-                                                - Format your CSV the same way as the sample file below. <br>
-                                                - Valid fields Tip: make sure name of fields must be following: name<br>
-                                                - Required And Unique field's (name)<br>
-                                                - When an error occurs download the error file and correct the incorrect
-                                                cells and import that file again through format.<br>
-                                            </p>
-                                        </div>
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="fw-bold">Select File</label>
-                                        <input type="file" class="form-control" name="file" accept=".csv" required>
-                                        <div class="mt-1">
-                                            <small class="d-block">
-                                                Supported files: <b class="fw-bold">csv</b>
-                                            </small>
-                                            <small>
-                                                Download sample template file from here <a href="https://script.viserlab.com/torylab/assets/files/sample/category.csv" title="Download csv file" class="text--primary" download>
-                                                    <b>csv</b>
-                                                </a>
-                                            </small>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="Submit" class="btn btn--primary w-100 h-45">Import</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="confirmationModal" class="modal fade" tabindex="-1" role="dialog">
-                    <div class="modal-dialog" role="document">
-                        <div class="modal-content">
-                            <div class="modal-header">
-                                <h5 class="modal-title">Confirmation Alert!</h5>
-                                <button type="button" class="close" data-bs-dismiss="modal" aria-label="Close">
-                                    <i class="las la-times"></i>
-                                </button>
-                            </div>
-                            <form action="" method="POST">
-                                <input type="hidden" name="_token" value="zv105s8kd1s2nyZ6nvoqU6pROYAnsCPYkYXTDlWn">
-                                <div class="modal-body">
-                                    <p class="question"></p>
-                                </div>
-                                <div class="modal-footer">
-                                    <button type="button" class="btn btn--dark" data-bs-dismiss="modal">No</button>
-                                    <button type="submit" class="btn btn--primary">Yes</button>
-                                </div>
-                            </form>
-                        </div>
-                    </div>
-                </div>
-
             </div><!-- bodywrapper__inner end -->
         </div><!-- body-wrapper end -->
     </div>
@@ -218,10 +155,12 @@
                 // Extract category ID and name from data attributes
                 var categoryId = $(this).data('category-id');
                 var categoryName = $(this).data('category-name');
-
+                var categoryUrdu = $(this).data('category-urdu');
                 // Set the extracted values in the modal fields
                 $('#editCategoryId').val(categoryId);
                 $('#editCategoryName').val(categoryName);
+                $('#editCategoryUrdu').val(categoryUrdu);
+
             });
         });
     </script>

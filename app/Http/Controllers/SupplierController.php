@@ -34,6 +34,7 @@ class SupplierController extends Controller
             $Supplier = Supplier::create([
                 'admin_or_user_id'    => $userId,
                 'name'          => $request->name,
+                'urdu_name'      => $request->urdu_name,
                 'mobile'          => $request->mobile,
                 'city'          => $request->city,
                 'area'          => $request->area,
@@ -68,6 +69,7 @@ class SupplierController extends Controller
                 $supplier->update([
                     'admin_or_user_id' => $userId,
                     'name'             => $request->input('name'),
+                    'urdu_name'      => $request->input('urdu_name'),
                     'mobile'           => $request->input('mobile'),
                     'city'             => $request->input('city'),
                     'area'             => $request->input('area'),
