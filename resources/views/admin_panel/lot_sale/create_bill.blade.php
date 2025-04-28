@@ -273,7 +273,6 @@
             }
 
             let totalExpense = 0;
-            let commissionAmount = 0;
 
             document.querySelectorAll('#expenseTable tbody tr').forEach(row => {
                 const type = row.querySelector('.expense-type').value;
@@ -282,8 +281,8 @@
                 let final = 0;
 
                 if (type === 'Commission') {
-                    commissionAmount = subtotal * (value / 100);
-                    final = commissionAmount;
+                    final = subtotal * (value / 100);
+                    totalExpense += final;
                 } else {
                     final = value;
                     totalExpense += final;
@@ -294,11 +293,14 @@
 
             document.getElementById('totalExpense').textContent = Math.round(totalExpense);
 
-            const netPay = subtotal - totalMazdori - totalExpense + (adjustmentValue ?? 0) - commissionAmount;
+            // ***** UPDATED FORMULA here *****
+            const netPay = subtotal - totalExpense + (adjustmentValue ?? 0);
 
             document.getElementById('netPay').textContent = Math.round(netPay);
             document.getElementById('net_pay_to_vendor').value = Math.round(netPay);
         }
+
+
 
         function validateBill() {
             const hasBillRows = document.querySelector('#billTable tbody').children.length;
