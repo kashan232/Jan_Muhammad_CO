@@ -1,5 +1,7 @@
 @include('admin_panel.include.header_include')
 <style>
+    /* ====== Common Styles (Screen + Print) ====== */
+
     .print-section .container {
         padding: 10px 15px;
     }
@@ -15,7 +17,8 @@
         border-collapse: collapse;
         font-size: 14px;
         line-height: 1.2;
-        margin-bottom: 20px;
+        margin-bottom: 10px;
+        /* Less space between tables */
     }
 
     .print-table th,
@@ -32,44 +35,67 @@
         margin-bottom: 10px;
     }
 
+    /* ====== Print Specific Styles ====== */
     @media print {
+
+        /* Show the print section */
         .print-section {
             display: block !important;
         }
 
+        /* Remove margins/paddings of body and html */
         body,
         html {
             margin: 0;
             padding: 0;
         }
 
+        /* Hide unwanted elements while printing */
         #daily-sale-div,
-        #print-btn-sale {
-            display: none;
-        }
-
-        #daily-sale-head {
-            display: none;
-        }
-
-        .col-print-6 {
-            width: 50%;
-            float: left;
-            padding: 5px;
-            box-sizing: border-box;
-            page-break-inside: avoid;
-        }
-
+        #print-btn-sale,
+        #daily-sale-head,
         .navbar-wrapper {
             display: none !important;
         }
 
+        /* Layout for rows and columns */
+        .print-section .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-bottom: 0;
+            /* No extra space between rows */
+        }
+
+        .print-section .col-print-6 {
+            width: 48%;
+            flex: 0 0 48%;
+            padding: 5px;
+            box-sizing: border-box;
+            page-break-inside: avoid;
+            margin-right: 2%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Remove right margin for every 2nd column */
+        .print-section .row .col-print-6:nth-child(2n) {
+            margin-right: 0;
+        }
+
+        /* If only one column exists in the row, make it full width */
+        .print-section .row:has(.col-print-6:only-child) .col-print-6 {
+            width: 100%;
+            margin-right: 0;
+        }
+
+        /* Page settings */
         @page {
             size: auto;
             margin: 10mm;
         }
     }
 </style>
+
 
 <body>
     <div class="page-wrapper default-version">
@@ -103,7 +129,7 @@
                     </div>
                 </div>
 
-                <button onclick="window.print()" class="btn btn-primary my-3" id="print-btn-sale">Print</button>
+                <button onclick="window.print()" class="btn btn-danger" id="print-btn-sale">Print</button>
 
                 <div class="table-responsive mt-4">
                     <table class="table table-bordered table-hover shadow-sm rounded-3" style="width:100%">
@@ -113,9 +139,9 @@
                 </div>
 
                 <div class="print-section d-none" id="printSection">
-                    <div class="container mt-3">
+                    <div class="container">
                         <div class="print-header">Daily Customer Sales Report</div>
-                        <div class="text-center mb-3" id="printDateRange" style="font-size: 14px;"></div>
+                        <div class="text-center" id="printDateRange" style="font-size: 14px;"></div>
 
                         <div class="row" id="printContentRow">
                             <!-- Dynamic columns will be injected here -->
@@ -163,95 +189,187 @@
                     });
 
                     let printContent = '';
+                    let customerKeys = Object.keys(grouped);
 
-                    Object.keys(grouped).forEach((customer, index) => {
-                        let customerSales = grouped[customer];
-                        let lotsHtml = '';
-                        let cashHtml = '';
-                        let totalLots = 0;
-                        let totalCashAmount = 0;
-                        let totalLotAmount = 0;
+                    for (let i = 0; i < customerKeys.length; i += 2) {
+                        printContent += '<div class="row">'; // Start a new row
 
-                        customerSales.forEach(item => {
-                            if (item.type === 'cash') {
-                                cashHtml += `
-                    <tr>
-                        <td>${item.date}</td>
-                        <td>${item.description}</td>
-                        <td>${parseFloat(item.amount).toFixed(2)}</td>
-                    </tr>
-                `;
-                                totalCashAmount += parseFloat(item.amount);
-                            } else {
-                                lotsHtml += `
-                    <tr>
-                        <td>${item.quantity}</td>
-                        <td>${item.unit} (${item.unit_in})</td>
-                        <td>${item.price}</td>
-                        <td>${item.total}</td>
-                    </tr>
-                `;
-                                totalLots += parseFloat(item.quantity);
-                                totalLotAmount += parseFloat(item.total);
-                            }
-                        });
+                        // Process the first customer in the pair
+                        let customer1 = customerKeys[i];
+                        if (customer1) {
+                            let customerSales1 = grouped[customer1];
+                            let lotsHtml1 = '';
+                            let cashHtml1 = '';
+                            let totalLots1 = 0;
+                            let totalCashAmount1 = 0;
+                            let totalLotAmount1 = 0;
 
-                        let totalAmount = totalCashAmount + totalLotAmount;
+                            customerSales1.forEach(item => {
+                                if (item.type === 'cash') {
+                                    cashHtml1 += `
+                        <tr>
+                            <td>${item.date}</td>
+                            <td>${item.description}</td>
+                            <td>${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                                    totalCashAmount1 += parseFloat(item.amount);
+                                } else {
+                                    lotsHtml1 += `
+                        <tr>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit} (${item.unit_in})</td>
+                            <td>${item.price}</td>
+                            <td>${item.total}</td>
+                        </tr>
+                    `;
+                                    totalLots1 += parseFloat(item.quantity);
+                                    totalLotAmount1 += parseFloat(item.total);
+                                }
+                            });
 
-                        grandLots += totalLots;
-                        grandAmount += totalAmount;
+                            let totalAmount1 = totalCashAmount1 + totalLotAmount1;
+                            grandLots += totalLots1;
+                            grandAmount += totalAmount1;
 
-                        let printCard = `
-            <div class="col-print-6">
-                <div class="customer-name">${customer}</div>
-                ${lotsHtml ? `
-                    <table class="print-table">
-                        <thead>
-                            <tr>
-                                <th>Lots</th>
-                                <th>U.In</th>
-                                <th>Rate</th>
-                                <th>Total</th>
-                            </tr>
-                        </thead>
-                        <tbody>${lotsHtml}</tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="3" class="text-end">Total Lots:</td>
-                                <td>${totalLots.toFixed(2)}</td>
-                            </tr>
-                            <tr>
-                                <td colspan="3" class="text-end">Total Amount:</td>
-                                <td>${totalAmount.toFixed(2)}</td>
-                            </tr>
-                        </tfoot>
-                    </table>` : ''
-                }
+                            printContent += `
+                <div class="col-print-6">
+                    <div class="customer-name">${customer1}</div>
+                    ${lotsHtml1 ? `
+                        <table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>Lots</th>
+                                    <th>U.In</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>${lotsHtml1}</tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end">Total Lots:</td>
+                                    <td>${totalLots1.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end">Total Amount:</td>
+                                    <td>${totalAmount1.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>` : ''
+                    }
+                    ${cashHtml1 ? `
+                        <div class="customer-name">Cash</div>
+                        <table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>${cashHtml1}</tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2">Total Amount:</td>
+                                    <td>${totalCashAmount1.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>` : ''
+                    }
+                </div>
+            `;
+                        }
 
-                ${cashHtml ? `
-                    <div class="customer-name">Cash</div>
-                    <table class="print-table">
-                        <thead>
-                            <tr>
-                                <th>Date</th>
-                                <th>Description</th>
-                                <th>Amount</th>
-                            </tr>
-                        </thead>
-                        <tbody>${cashHtml}</tbody>
-                        <tfoot>
-                            <tr>
-                                <td colspan="2">Total Amount:</td>
-                                <td>${totalCashAmount.toFixed(2)}</td>
-                            </tr>
-                        </tfoot>
-                    </table>` : ''
-                }
-            </div>
-        `;
+                        // Process the second customer in the pair
+                        let customer2 = customerKeys[i + 1];
+                        if (customer2) {
+                            let customerSales2 = grouped[customer2];
+                            let lotsHtml2 = '';
+                            let cashHtml2 = '';
+                            let totalLots2 = 0;
+                            let totalCashAmount2 = 0;
+                            let totalLotAmount2 = 0;
 
-                        printContent += printCard;
-                    });
+                            customerSales2.forEach(item => {
+                                if (item.type === 'cash') {
+                                    cashHtml2 += `
+                        <tr>
+                            <td>${item.date}</td>
+                            <td>${item.description}</td>
+                            <td>${parseFloat(item.amount).toFixed(2)}</td>
+                        </tr>
+                    `;
+                                    totalCashAmount2 += parseFloat(item.amount);
+                                } else {
+                                    lotsHtml2 += `
+                        <tr>
+                            <td>${item.quantity}</td>
+                            <td>${item.unit} (${item.unit_in})</td>
+                            <td>${item.price}</td>
+                            <td>${item.total}</td>
+                        </tr>
+                    `;
+                                    totalLots2 += parseFloat(item.quantity);
+                                    totalLotAmount2 += parseFloat(item.total);
+                                }
+                            });
+
+                            let totalAmount2 = totalCashAmount2 + totalLotAmount2;
+                            grandLots += totalLots2;
+                            grandAmount += totalAmount2;
+
+                            printContent += `
+                <div class="col-print-6">
+                    <div class="customer-name">${customer2}</div>
+                    ${lotsHtml2 ? `
+                        <table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>Lots</th>
+                                    <th>U.In</th>
+                                    <th>Rate</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>${lotsHtml2}</tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="3" class="text-end">Total Lots:</td>
+                                    <td>${totalLots2.toFixed(2)}</td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3" class="text-end">Total Amount:</td>
+                                    <td>${totalAmount2.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>` : ''
+                    }
+                    ${cashHtml2 ? `
+                        <div class="customer-name">Cash</div>
+                        <table class="print-table">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Description</th>
+                                    <th>Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>${cashHtml2}</tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="2">Total Amount:</td>
+                                    <td>${totalCashAmount2.toFixed(2)}</td>
+                                </tr>
+                            </tfoot>
+                        </table>` : ''
+                    }
+                </div>
+            `;
+                        }
+
+                        printContent += '</div>'; // End the row
+                    }
 
                     printContent += `
         <div class="col-print-12 mt-4">
@@ -273,10 +391,8 @@
 
                     $('#printContentRow').html(printContent);
                     $('#printDateRange').text(`From ${start} to ${end}`);
-
                     $('#printSection').removeClass('d-none');
                 },
-
                 error: function() {
                     alert('Something went wrong. Please try again.');
                 }
