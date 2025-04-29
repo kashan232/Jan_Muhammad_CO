@@ -254,14 +254,14 @@
                                 <table class="main-table table table-bordered table-striped">
                                     <thead class="table-light" style="background:#e8e8e8!important;">
                                         <tr>
-                                            <th data-ur="تَن٘گ" style="color:#000;">تَن٘گ</th>
+                                            <th data-ur="نگ" style="color:#000;">نگ</th>
                                             <th data-ur="وزن" style="color:#000;">وزن</th> {{-- نیا وزن کا کالم --}}
                                             <th data-ur="یونٹ" style="color:#000;">یونٹ</th>
-                                            <th data-ur="زمرہ" style="color:#000;">زمرہ</th>
+                                            <th data-ur="جنس" style="color:#000;">جنس</th>
                                             <th data-ur="اقسام" style="color:#000;">اقسام</th>
-                                            <th data-ur="اکائی" style="color:#000;">اکائی</th>
-                                            <th data-ur="شرح" style="color:#000;">شرح</th>
-                                            <th data-ur="کل" style="color:#000;">کل</th>
+                                            <th data-ur="سائز" style="color:#000;">سائز</th>
+                                            <th data-ur="ریٹ" style="color:#000;">ریٹ</th>
+                                            <th data-ur="ٹوٹل" style="color:#000;">ٹوٹل</th>
                                         </tr>
                                     </thead>
 
@@ -312,13 +312,13 @@
 
                                             {{-- آخر میں total row --}}
                                             <tr class="lot-total-row">
-                                                <td class="text-center">کل لاٹس: {{ number_format($totalSaleUnits) }}</td>
+                                                <td class="text-center">کل نگ	: {{ number_format($totalSaleUnits) }}</td>
                                                 <td class="text-center">کل وزن: {{ number_format($totalRowWeights) }}</td>
                                                 <td class="text-end"></td>
                                                 <td class="text-end"></td>
                                                 <td class="text-end"></td>
                                                 <td class="text-end"></td>
-                                                <td colspan="1" class="text-end">کل</td>
+                                                <td colspan="1" class="text-end">ٹوٹل</td>
                                                 <td>{{ number_format($bill->subtotal) }}</td>
                                             </tr>
                                     </tbody>
@@ -360,19 +360,19 @@
                                             <table class="expense-table table table-bordered">
                                                 <tbody>
                                                     <tr>
-                                                        <td><strong>کل:</strong></td>
+                                                        <td><strong>کل</strong></td>
                                                         <td>{{ number_format($bill->subtotal) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><strong>کل اخراجات:</strong></td>
+                                                        <td><strong>اخراجات</strong></td>
                                                         <td>{{ number_format($bill->total_expense) }}</td>
                                                     </tr>
                                                     <tr>
-                                                        <td><strong>کل ایڈجسٹمنٹ:</strong></td>
+                                                        <td><strong>ایڈجیسٹمینٹ</strong></td>
                                                         <td>{{ number_format($bill->adjustment) }}</td>
                                                     </tr>
                                                     <tr class="net-row" style="color:218838;">
-                                                        <td><strong>نیٹ رقم:</strong></td>
+                                                        <td><strong>صافی رقم</strong></td>
                                                         <td>{{ number_format($bill->net_pay) }}</td>
                                                     </tr>
                                                 </tbody>
