@@ -92,7 +92,7 @@
 
                                     <div class="form-group">
                                         <label>Brand Name (Urdu)</label>
-                                        <input type="text" name="brand_urdu" class="form-control" dir="rtl" style="font-family: 'Noto Nastaliq Urdu', serif;">
+                                        <input type="text" name="brand_name_urdu" class="form-control" dir="rtl" style="font-family: 'Noto Nastaliq Urdu', serif;">
                                     </div>
 
                                 </div>

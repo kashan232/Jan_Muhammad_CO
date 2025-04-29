@@ -359,20 +359,19 @@ class LotSaleController extends Controller
             ->where('truck_id', $truck_id)
             ->get()
             ->map(function ($lot) {
-                // Get all sales for this lot
                 $sales = DB::table('lot_sales')->where('lot_id', $lot->id)->get();
 
-                // Calculate total sale for this lot
                 $totalSale = $sales->sum(function ($sale) {
                     return $sale->quantity * $sale->price;
                 });
 
-                // Calculate average sale
                 $averageSale = $lot->total_units > 0 ? $totalSale / $lot->total_units : 0;
 
-                // Attach to object
+                $totalWeight = $sales->sum('weight'); // 👈 Add this line
+
                 $lot->total_sale = $totalSale;
                 $lot->average_sale = $averageSale;
+                $lot->total_weight = $totalWeight; // 👈 Attach weight
 
                 return $lot;
             });
@@ -425,6 +424,7 @@ class LotSaleController extends Controller
         foreach ($request->bill_details as $detail) {
             $lotId = $detail['lot_id'];
             $saleUnits = $detail['sale_units'];
+            $weight = $detail['weight'];
 
             if (!isset($lotSaleTotals[$lotId])) {
                 $lotSaleTotals[$lotId] = 0;
@@ -464,6 +464,7 @@ class LotSaleController extends Controller
 
         $bill->lot_id = json_encode(array_column($request->bill_details, 'lot_id'));
         $bill->sale_units = json_encode(array_column($request->bill_details, 'sale_units'));
+        $bill->weight = json_encode(array_column($request->bill_details, 'weight'));
         $bill->rate = json_encode(array_column($request->bill_details, 'rate'));
         $bill->amount = json_encode(array_column($request->bill_details, 'amount'));
         $bill->unit_in = json_encode(array_column($request->bill_details, 'unit_in'));
@@ -512,6 +513,8 @@ class LotSaleController extends Controller
         $categoryMap = \App\Models\Category::pluck('category_urdu', 'category')->toArray();
         $varietyMap = \App\Models\Brand::pluck('brand_urdu', 'brand')->toArray();
 
+        $weights = json_decode($bill->weight, true); // assuming 'weight' field exists in DB and is a JSON array
+        $totalWeights = array_sum($weights);
         // Custom categories
         $customCategoryMap = [
             'Mazdori' => 'مزدوری',
@@ -537,7 +540,6 @@ class LotSaleController extends Controller
                 ],
             ];
         });
-
         return view('admin_panel.lot_sale.bill_book', compact(
             'bill',
             'vendorName',
@@ -548,7 +550,9 @@ class LotSaleController extends Controller
             'units_in',
             'lotEntries',
             'categories',
-            'categories_ur'
+            'categories_ur',
+            'weights',
+            'totalWeights'
         ));
     }
 }

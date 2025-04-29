@@ -255,6 +255,7 @@
                                     <thead class="table-light" style="background:#e8e8e8!important;">
                                         <tr>
                                             <th data-ur="تَن٘گ" style="color:#000;">تَن٘گ</th>
+                                            <th data-ur="وزن" style="color:#000;">وزن</th> {{-- نیا وزن کا کالم --}}
                                             <th data-ur="یونٹ" style="color:#000;">یونٹ</th>
                                             <th data-ur="زمرہ" style="color:#000;">زمرہ</th>
                                             <th data-ur="اقسام" style="color:#000;">اقسام</th>
@@ -263,9 +264,11 @@
                                             <th data-ur="کل" style="color:#000;">کل</th>
                                         </tr>
                                     </thead>
+
                                     <tbody>
                                         @php
                                         $totalSaleUnits = 0;
+                                        $totalRowWeights = 0;
                                         $existingRows = count($lot_ids);
                                         $minRows = 5; // کم سے کم 5 rows چاہیے
                                         @endphp
@@ -274,11 +277,14 @@
                                         @foreach ($lot_ids as $index => $lotId)
                                         @php
                                         $unit = (int)($sale_units[$index] ?? 0);
+                                        $weight = (float)($weights[$index] ?? 0);
                                         $totalSaleUnits += $unit;
+                                        $totalRowWeights += $weight;
                                         $lot = $lotEntries[$lotId] ?? null;
                                         @endphp
                                         <tr>
                                             <td>{{ $unit }}</td>
+                                            <td>{{ number_format($weight) }}</td> 
                                             <td>{{ $lot->unit_in_ur ?? 'نہیں ملا' }}</td>
                                             <td>{{ $lot->category_ur ?? '' }}</td>
                                             <td>{{ $lot->variety_ur ?? '' }}</td>
@@ -299,6 +305,7 @@
                                             <td></td>
                                             <td></td>
                                             <td></td>
+                                            <td></td>
                                             </tr>
                                             @endfor
                                             @endif
@@ -306,6 +313,7 @@
                                             {{-- آخر میں total row --}}
                                             <tr class="lot-total-row">
                                                 <td class="text-center">کل لاٹس: {{ number_format($totalSaleUnits) }}</td>
+                                                <td class="text-center">کل وزن: {{ number_format($totalRowWeights) }}</td>
                                                 <td class="text-end"></td>
                                                 <td class="text-end"></td>
                                                 <td class="text-end"></td>

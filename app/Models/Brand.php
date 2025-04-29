@@ -16,10 +16,6 @@ class Brand extends Model
     {
         return $this->hasMany(Product::class, 'brand', 'brand');
     }
+    protected $guarded = [];
 
-    
-    protected $fillable = [
-        'admin_or_user_id',
-        'brand'
-    ];
 }

@@ -35,7 +35,7 @@ class BrandController extends Controller
             Brand::create([
                 'admin_or_user_id' => $userId,
                 'brand'            => $request->brand,
-                'brand_urdu'       => $request->brand_urdu,
+                'brand_urdu'       => $request->brand_name_urdu,
                 'created_at'       => Carbon::now(),
                 'updated_at'       => Carbon::now(),
             ]);

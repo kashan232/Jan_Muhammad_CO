@@ -28,6 +28,7 @@
                                             <th>Unit In</th>
                                             <th>Total Units</th>
                                             <th>Available Units</th>
+                                            <th>Total Weight</th>
                                             <th>Sale Average</th>
                                             <th>Total Sale</th>
                                             <th>Action</th>
@@ -42,11 +43,12 @@
                                             <td>{{ $lot->unit_in }}</td>
                                             <td>{{ $lot->total_units }}</td>
                                             <td>{{ $lot->lot_quantity }}</td>
+                                            <td>{{ $lot->total_weight }}</td>
                                             <td>{{ number_format($lot->average_sale, 2) }}</td>
                                             <td>{{ number_format($lot->total_sale, 2) }}</td>
                                             <td>
                                                 <button type="button" class="btn btn-primary btn-sm"
-                                                    onclick="addBillRow({{ $lot->id }}, '{{ $lot->category }}', '{{ $lot->variety }}', '{{ $lot->unit }}', {{ $lot->total_units }}, '{{ $lot->unit_in }}')">
+                                                    onclick="addBillRow({{ $lot->id }}, '{{ $lot->category }}', '{{ $lot->variety }}', '{{ $lot->unit }}', {{ $lot->total_units }}, '{{ $lot->unit_in }}', '{{ $lot->total_weight }}')">
                                                     Add to Bill
                                                 </button>
                                             </td>
@@ -63,12 +65,14 @@
                                         <tr>
                                             <th>Bill Type</th>
                                             <th>Total Units</th>
+                                            <th>Total Weight</th> <!-- New Column -->
                                             <th>Sale Units</th>
                                             <th>Rate</th>
                                             <th>Amount</th>
                                             <th>Action</th>
                                         </tr>
                                     </thead>
+
                                     <tbody></tbody>
                                 </table>
                             </div>
@@ -150,7 +154,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
 
     <script>
-        function addBillRow(id, category, variety, unit, total_units, unit_in) {
+        function addBillRow(id, category, variety, unit, total_units, unit_in, total_weight) {
             const billTable = document.querySelector('#billTable tbody');
 
             const lastRow = billTable.querySelector("tr:last-child");
@@ -165,19 +169,21 @@
 
             const billRow = document.createElement('tr');
             billRow.innerHTML = `
-            <td>
-                ${category} - ${variety} (${unit})<br>
-                <small class="text-muted">Unit In: ${unit_in}</small>
-                <input type="hidden" name="lots[]" value="${id}">
-                <input type="hidden" name="unit_in[${id}]" value="${unit_in}">
-            </td>
-            <td>${total_units}</td>
-            <td><input type="number" name="sale_units[]" class="form-control sale-units" min="1" max="${total_units}" required></td>
-<td><input type="number" name="rate[]" class="form-control rate" min="1" required></td>
-<td><input type="number" name="amount[]" class="form-control amount" readonly></td>
-
-            <td><button type="button" class="btn btn-danger btn-sm" onclick="removeBothRows(this, ${id})">Remove</button></td>
-        `;
+    <td>
+        ${category} - ${variety} (${unit})<br>
+        <small class="text-muted">Unit In: ${unit_in}</small>
+        <input type="hidden" name="lots[]" value="${id}">
+        <input type="hidden" name="unit_in[${id}]" value="${unit_in}">
+    </td>
+    <td>${total_units}</td>
+    <td>
+        <input type="number" name="weight[]" class="form-control weight" step="any" min="0" value="${total_weight}" required>
+    </td>
+    <td><input type="number" name="sale_units[]" style="width:130px;" class="form-control sale-units" min="1" max="${total_units}" required></td>
+    <td><input type="number" name="rate[]"  style="width:130px;" class="form-control rate" min="1" required></td>
+    <td><input type="number" name="amount[]" style="width:130px;" class="form-control amount" readonly></td>
+    <td><button type="button" class="btn btn-danger btn-sm" onclick="removeBothRows(this, ${id})">Remove</button></td>
+`;
             billTable.appendChild(billRow);
 
             billRow.querySelector('.sale-units').addEventListener('input', updateRowAmount);
@@ -368,7 +374,8 @@
                     sale_units: row.querySelector('.sale-units').value,
                     rate: row.querySelector('.rate').value,
                     amount: row.querySelector('.amount').value,
-                    unit_in: row.querySelector('input[name^="unit_in"]').value
+                    unit_in: row.querySelector('input[name^="unit_in"]').value,
+                    weight: row.querySelector('.weight').value // 👈 Add this line
                 });
             });
 

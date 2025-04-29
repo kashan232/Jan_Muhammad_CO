@@ -16,9 +16,6 @@ class Category extends Model
      {
          return $this->hasMany(Product::class, 'category_id');
      }
-     
-    protected $fillable = [
-        'admin_or_user_id',
-        'category'
-    ];
+     protected $guarded = [];
+
 }
