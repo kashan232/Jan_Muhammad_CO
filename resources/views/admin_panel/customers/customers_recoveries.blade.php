@@ -32,6 +32,7 @@
                                                 <th>Customer</th>
                                                 <th>Description</th>
                                                 <th>Amount Paid</th>
+                                                <th>Bank</th>
                                                 <th>Date</th>
                                             </tr>
                                         </thead>
@@ -42,6 +43,7 @@
                                                 <td>{{ $recovery->customer->customer_name ?? 'N/A' }}</td>
                                                 <td>{{ $recovery->description }}</td>
                                                 <td>{{ number_format($recovery->amount_paid, 0) }}</td>
+                                                <td>{{ $recovery->Bank }}</td>
                                                 <td>{{ $recovery->date }}</td>
 
                                             </tr>

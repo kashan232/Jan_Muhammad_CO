@@ -202,6 +202,18 @@
                         <span class="menu-title">Daily Sale</span>
                     </a><i class=""></i>
                 </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('customer-payments') }}" class="nav-link">
+                        <i class="menu-icon fas fa-calendar-alt"></i>
+                        <span class="menu-title">Customer Payments</span>
+                    </a><i class=""></i>
+                </li>
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('Vendor-payments') }}" class="nav-link">
+                        <i class="menu-icon fas fa-calendar-alt"></i>
+                        <span class="menu-title">Vendors Payments</span>
+                    </a><i class=""></i>
+                </li>
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>

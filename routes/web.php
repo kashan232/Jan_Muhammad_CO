@@ -16,6 +16,7 @@ use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\PaymentController;
 use App\Http\Controllers\TruckEntryController;
 use App\Http\Controllers\UnitInController;
 use App\Http\Controllers\VendorController;
@@ -210,6 +211,7 @@ Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('tru
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
 
+
 Route::get('/create-bill/{truck_id}/{vendor_id}', [LotSaleController::class, 'Create_Bill'])->name('Create-Bill');
 Route::post('/vendor-bill/store', [LotSaleController::class, 'store_Bill'])->name('vendor.bill.store');
 Route::get('/vendor-bill/view/{id}', [LotSaleController::class, 'view'])->name('view-vendor-bill');
@@ -220,7 +222,13 @@ Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])
 Route::get('/customer-ledger/{id}', [CustomerController::class, 'fetchLedger'])->name('customer.ledger');
 Route::get('/lot/sale/{id}', [CustomerController::class, 'getLotDetails'])->name('lot.sale.details');
 
+Route::get('/customer-payments', [PaymentController::class, 'customer_payments'])->middleware(['auth', 'admin'])->name('customer-payments');
+Route::get('/get-customer-balance/{id}', [PaymentController::class, 'getCustomerBalance'])->name('get.customer.balance');
+Route::post('/customer-payment/store', [PaymentController::class, 'storeCustomerPayment'])->name('customer.payment.store');
 
+Route::get('/Vendor-payments', [PaymentController::class, 'Vendor_payments'])->middleware(['auth', 'admin'])->name('Vendor-payments');
+Route::post('/vendor-payment-store', [PaymentController::class, 'storeVendorPayment'])->name('vendor-payment-store');
+Route::get('/get-vendor-balance/{id}', [PaymentController::class, 'getVendorBalance'])->name('get-Vendor-balance');
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

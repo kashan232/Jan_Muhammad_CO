@@ -259,6 +259,7 @@ class LotSaleController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : null;
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : null;
 
+        // Fetch lot sales
         $query = DB::table('lot_sales')
             ->join('lot_entries', 'lot_sales.lot_id', '=', 'lot_entries.id')
             ->join('truck_entries', 'lot_entries.truck_id', '=', 'truck_entries.id')
@@ -281,8 +282,27 @@ class LotSaleController extends Controller
 
         $sales = $query->orderBy('lot_sales.sale_date')->get();
 
-        return response()->json($sales);
+        // Get previous balance
+        $customerLedger = DB::table('customer_ledgers')
+            ->where('customer_id', $customerId)
+            ->first();
+
+        // Get total recoveries
+        $recoveries = DB::table('customer_recoveries')
+            ->where('customer_ledger_id', $customerId)
+            ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
+                return $q->whereBetween('date', [$startDate, $endDate]);
+            })
+            ->get();
+
+        return response()->json([
+            'sales' => $sales,
+            'previous_balance' => $customerLedger->previous_balance ?? 0,
+            'total_recovery' => $recoveries->sum('amount_paid'),
+        ]);
     }
+    
+
 
     public function cash_sale()
     {
@@ -554,5 +574,11 @@ class LotSaleController extends Controller
             'weights',
             'totalWeights'
         ));
+    }
+
+    public function recepit_customer_sale()
+    {
+        $customers = Customer::all();
+        return view('admin_panel.lot_sale.recepit_customer_sale', compact('customers'));
     }
 }

@@ -79,70 +79,85 @@
                         start_date: startDate,
                         end_date: endDate
                     },
-                    success: function(response) {
-                        var groupedSales = {};
-                        var grandTotal = 0;
+                   success: function(response) {
+    var groupedSales = {};
+    var grandTotal = 0;
 
-                        // Group sales by date
-                        response.forEach(function(sale) {
-                            if (!groupedSales[sale.sale_date]) {
-                                groupedSales[sale.sale_date] = { sales: [], subtotal: 0 };
-                            }
-                            groupedSales[sale.sale_date].sales.push(sale);
-                            groupedSales[sale.sale_date].subtotal += parseFloat(sale.total);
-                            grandTotal += parseFloat(sale.total);
-                        });
+    // Group sales by date
+    response.sales.forEach(function(sale) {
+        if (!groupedSales[sale.sale_date]) {
+            groupedSales[sale.sale_date] = { sales: [], subtotal: 0 };
+        }
+        groupedSales[sale.sale_date].sales.push(sale);
+        groupedSales[sale.sale_date].subtotal += parseFloat(sale.total);
+        grandTotal += parseFloat(sale.total);
+    });
 
-                        var ledgerHtml = "";
+    // Build Sales Ledger UI
+    var ledgerHtml = "";
+    Object.keys(groupedSales).forEach(function(date) {
+        var dailySales = groupedSales[date];
+        ledgerHtml += `
+            <div class="card shadow-lg mb-4">
+                <div class="card-body">
+                    <h5 class="text-secondary border-bottom pb-2">Sales on ${date}</h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover align-middle">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Truck Number</th>
+                                    <th>Driver Name</th>
+                                    <th>Category</th>
+                                    <th>Variety</th>
+                                    <th>Unit</th>
+                                    <th>Quantity</th>
+                                    <th>Price</th>
+                                    <th>Total</th>
+                                </tr>
+                            </thead>
+                            <tbody>`;
+        
+        dailySales.sales.forEach(function(sale) {
+            ledgerHtml += `<tr>
+                <td>${sale.truck_number}</td>
+                <td>${sale.driver_name}</td>
+                <td>${sale.category}</td>
+                <td>${sale.variety}</td>
+                <td>${sale.unit}</td>
+                <td>${sale.quantity}</td>
+                <td>${sale.price}</td>
+                <td>${sale.total}</td>
+            </tr>`;
+        });
 
-                        // Generate tables per date
-                        Object.keys(groupedSales).forEach(function(date) {
-                            var dailySales = groupedSales[date];
-                            ledgerHtml += `
-                                <div class="card shadow-lg mb-4">
-                                    <div class="card-body">
-                                        <h5 class="text-secondary border-bottom pb-2">Sales on ${date}</h5>
-                                        <div class="table-responsive">
-                                            <table class="table table-striped table-hover align-middle">
-                                                <thead class="table-dark">
-                                                    <tr>
-                                                        <th>Truck Number</th>
-                                                        <th>Driver Name</th>
-                                                        <th>Category</th>
-                                                        <th>Variety</th>
-                                                        <th>Unit</th>
-                                                        <th>Quantity</th>
-                                                        <th>Price</th>
-                                                        <th>Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>`;
-                            
-                            dailySales.sales.forEach(function(sale) {
-                                ledgerHtml += `<tr>
-                                    <td>${sale.truck_number}</td>
-                                    <td>${sale.driver_name}</td>
-                                    <td>${sale.category}</td>
-                                    <td>${sale.variety}</td>
-                                    <td>${sale.unit}</td>
-                                    <td>${sale.quantity}</td>
-                                    <td>${sale.price}</td>
-                                    <td>${sale.total}</td>
-                                    
-                                </tr>`;
-                            });
+        ledgerHtml += `</tbody></table></div>
+                        <h5 class="fw-bold text-end">Subtotal: ${dailySales.subtotal} PKR</h5>
+                    </div>
+                </div>`;
+    });
 
-                            ledgerHtml += `</tbody>
-                                            </table>
-                                        </div>
-                                        <h5 class="fw-bold text-end">Subtotal: ${dailySales.subtotal} PKR</h5>
-                                    </div>
-                                </div>`;
-                        });
+    // Receipt Data Calculation
+    var previousBalance = parseFloat(response.previous_balance || 0);
+    var recoveryAmount = parseFloat(response.total_recovery || 0);
+    var total = previousBalance + grandTotal;
+    var netAmount = total - recoveryAmount;
 
-                        $("#salesLedger").html(ledgerHtml);
-                        $("#grandTotal").text(grandTotal);
-                    },
+    ledgerHtml += `
+        <div class="card shadow-lg">
+            <div class="card-body">
+                <h5 class="fw-bold">Receipt Summary</h5>
+                <p>Previous Balance: <strong>${previousBalance} PKR</strong></p>
+                <p>Sales Total: <strong>${grandTotal} PKR</strong></p>
+                <p>Total (Balance + Sales): <strong>${total} PKR</strong></p>
+                <p>Recovery Received: <strong>${recoveryAmount} PKR</strong></p>
+                <p class="text-primary fs-5">Net Amount: <strong>${netAmount} PKR</strong></p>
+            </div>
+        </div>`;
+
+    $("#salesLedger").html(ledgerHtml);
+    $("#grandTotal").text(grandTotal);
+}
+,
                     error: function() {
                         alert("Error fetching data");
                     }
