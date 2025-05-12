@@ -64,6 +64,21 @@ class LotSaleController extends Controller
     }
 
 
+    public function deleteBill($billId)
+    {
+        \Log::info("Attempting to delete Bill with ID: " . $billId);
+
+        $bill = VendorBill::withTrashed()->find($billId);
+
+        if ($bill) {
+            $bill->forceDelete(); // This will permanently delete the record
+            \Log::info("Bill permanently deleted.");
+        } else {
+            \Log::warning("Bill not found with ID: " . $billId);
+        }
+
+        return redirect()->back()->with('success', 'Bill has been permanently deleted.');
+    }
 
 
     public function show_Lots($truck_id)
@@ -231,7 +246,6 @@ class LotSaleController extends Controller
 
         if ($ledger) {
             $newBalance = $ledger->closing_balance - $sale->total;
-
             DB::table('customer_ledgers')->where('customer_id', $customer_id)->update([
                 'closing_balance' => $newBalance,
             ]);
@@ -240,12 +254,13 @@ class LotSaleController extends Controller
         // 5. Delete the sale record
         DB::table('lot_sales')->where('id', $sale_id)->delete();
 
-        return response()->json(['message' => 'Sale deleted, quantity restored, and balance adjusted.']);
+        // 6. Delete vendor bill related to this lot's truck_id
+        if ($lot->truck_id) {
+            DB::table('vendor_bills')->where('truck_id', $lot->truck_id)->delete();
+        }
+
+        return response()->json(['message' => 'Sale deleted, quantity restored, balance adjusted, and related vendor bill deleted.']);
     }
-
-
-
-
 
     public function customer_sale()
     {
@@ -259,7 +274,7 @@ class LotSaleController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date)->format('Y-m-d') : null;
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->format('Y-m-d') : null;
 
-        // Fetch lot sales
+        // Fetch lot sales for the current range
         $query = DB::table('lot_sales')
             ->join('lot_entries', 'lot_sales.lot_id', '=', 'lot_entries.id')
             ->join('truck_entries', 'lot_entries.truck_id', '=', 'truck_entries.id')
@@ -270,6 +285,7 @@ class LotSaleController extends Controller
                 'lot_entries.variety',
                 'lot_entries.unit',
                 'lot_sales.quantity',
+                'lot_sales.weight',
                 'lot_sales.price',
                 'lot_sales.total',
                 'truck_entries.truck_number',
@@ -282,26 +298,51 @@ class LotSaleController extends Controller
 
         $sales = $query->orderBy('lot_sales.sale_date')->get();
 
-        // Get previous balance
+        // Get opening balance
         $customerLedger = DB::table('customer_ledgers')
             ->where('customer_id', $customerId)
+            ->orderBy('created_at', 'desc')
             ->first();
 
-        // Get total recoveries
-        $recoveries = DB::table('customer_recoveries')
+        $openingBalance = $customerLedger ? $customerLedger->opening_balance : 0;
+
+        // Calculate previous balance excluding recoveries
+        $previousSales = DB::table('lot_sales')
+            ->where('customer_id', $customerId)
+            ->where('sale_date', '<', $startDate)
+            ->sum('total');
+
+        $previousRecoveries = DB::table('customer_recoveries')
+            ->where('customer_ledger_id', $customerId)
+            ->where('date', '<', $startDate)
+            ->sum('amount_paid');
+
+        $calculatedPreviousBalance = $openingBalance + $previousSales - $previousRecoveries;
+
+        // Current Sales
+        $currentSales = $sales->sum('total');
+
+        // Current Recoveries within the date range
+        $currentRecoveries = DB::table('customer_recoveries')
             ->where('customer_ledger_id', $customerId)
             ->when($startDate && $endDate, function ($q) use ($startDate, $endDate) {
                 return $q->whereBetween('date', [$startDate, $endDate]);
             })
-            ->get();
+            ->sum('amount_paid');
+
+        // Closing Balance Calculation
+        $closingBalance = $calculatedPreviousBalance + $currentSales - $currentRecoveries;
 
         return response()->json([
             'sales' => $sales,
-            'previous_balance' => $customerLedger->previous_balance ?? 0,
-            'total_recovery' => $recoveries->sum('amount_paid'),
+            'previous_balance' => $calculatedPreviousBalance,
+            'total_recovery' => $currentRecoveries,
+            'closing_balance' => $closingBalance,
         ]);
     }
-    
+
+
+
 
 
     public function cash_sale()

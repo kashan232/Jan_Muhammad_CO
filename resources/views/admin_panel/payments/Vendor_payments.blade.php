@@ -26,7 +26,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="supplier" class="form-label text-dark">Received From <span class="text-danger">*</span></label>
-                                <select id="supplier" name="supplier_id" class="form-select">
+                                <select id="supplier" name="supplier_id" class="form-select select2-basic">
                                     <option selected disabled>Select Vendor</option>
                                     @foreach($Suppliers as $Supplier)
                                     <option value="{{ $Supplier->id }}">{{ $Supplier->name }}</option>
@@ -91,45 +91,46 @@
 
     @include('admin_panel.include.footer_include')
     <script>
-        const routeTemplate = "{{ route('get-Vendor-balance', ['id' => 'SUPPLIER_ID']) }}";
-        document.addEventListener('DOMContentLoaded', function() {
-            const routeTemplate = "{{ route('get-Vendor-balance', ['id' => 'SUPPLIER_ID']) }}";
+        function fetchSupplierData(supplierId) {
+            let url = "{{ route('get-Vendor-balance', ['id' => 'SUPPLIER_ID']) }}".replace('SUPPLIER_ID', supplierId);
 
-            document.getElementById('supplier').addEventListener('change', function() {
-                let supplierId = this.value;
-                let url = routeTemplate.replace('SUPPLIER_ID', supplierId);
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('supplier_balance').innerText = 'PKR ' + data.balance;
 
-                fetch(url)
-                    .then(response => response.json())
-                    .then(data => {
-                        document.getElementById('supplier_balance').innerText = 'PKR ' + data.balance;
+                    let billsTbody = document.querySelector('#sales_table tbody');
+                    billsTbody.innerHTML = '';
 
-                        // ✅ Populate bills table (Corrected selector)
-                        let billsTbody = document.querySelector('#sales_table tbody');
-                        if (!billsTbody) {
-                            console.error('Sales table body not found');
-                            return;
-                        }
+                    if (data.bills && data.bills.length > 0) {
+                        data.bills.forEach(bill => {
+                            billsTbody.innerHTML += `
+                            <tr>
+                                <td>${new Date(bill.created_at).toLocaleDateString()}</td>
+                                <td>${bill.net_pay}</td>
+                            </tr>
+                        `;
+                        });
+                    } else {
+                        billsTbody.innerHTML = '<tr><td colspan="2">No Past Payments Found</td></tr>';
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching supplier data:', error);
+                });
+        }
 
-                        billsTbody.innerHTML = '';
+        $(document).ready(function() {
+            $('#supplier').select2();
 
-                        if (data.bills && data.bills.length > 0) {
-                            data.bills.forEach(bill => {
-                                billsTbody.innerHTML += `
-                                <tr>
-                                    <td>${new Date(bill.created_at).toLocaleDateString()}</td>
-                                    <td>${bill.net_pay}</td>
-                                </tr>
-                            `;
-                            });
-                        } else {
-                            billsTbody.innerHTML = '<tr><td colspan="2">No Past Payments Found</td></tr>';
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching supplier data:', error);
-                    });
+
+            $('#supplier').on('change', function() {
+                let supplierId = $(this).val();
+                if (supplierId) {
+                    fetchSupplierData(supplierId);
+                }
             });
         });
     </script>
+
 </body>

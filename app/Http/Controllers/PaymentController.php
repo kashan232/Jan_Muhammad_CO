@@ -46,35 +46,28 @@ class PaymentController extends Controller
 
 
     public function storeCustomerPayment(Request $request)
-    {
+    {   
+        dd($request);
         $latestLedger = CustomerLedger::where('customer_id', $request->customer_id)
             ->latest('id')
             ->first();
 
-        $previous_balance = $latestLedger ? $latestLedger->closing_balance : 0;
+        if (!$latestLedger) {
+            return redirect()->back()->with('error', 'Ledger record not found for this customer.');
+        }
+
+        $previous_balance = $latestLedger->closing_balance;
         $new_closing_balance = $previous_balance - $request->amount;
 
-        // ✅ Step 1: Update existing ledger if exists
-        if ($latestLedger) {
-            $latestLedger->update([
-                'closing_balance' => $new_closing_balance,
-            ]);
-            $ledger_id = $latestLedger->id;
-        } else {
-            // ✅ Or create only if not exists
-            $newLedger = CustomerLedger::create([
-                'admin_or_user_id' => auth()->id(),
-                'customer_id' => $request->customer_id,
-                'previous_balance' => $previous_balance,
-                'closing_balance' => $new_closing_balance,
-            ]);
-            $ledger_id = $newLedger->id;
-        }
+        // ✅ Step 1: Update existing ledger
+        $latestLedger->update([
+            'closing_balance' => $new_closing_balance,
+        ]);
 
         // ✅ Step 2: Create Recovery Record
         CustomerRecovery::create([
             'admin_or_user_id' => auth()->id(),
-            'customer_ledger_id' => $ledger_id,
+            'customer_ledger_id' => $request->customer_id,
             'amount_paid' => $request->amount,
             'description' => $request->bank,
             'Bank' => $request->detail,
@@ -83,6 +76,8 @@ class PaymentController extends Controller
 
         return redirect()->back()->with('success', 'Payment recorded successfully.');
     }
+
+
 
 
     public function Vendor_payments()

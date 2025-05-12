@@ -56,7 +56,9 @@
                 <div class="d-flex justify-content-between align-items-center mb-4">
                     <h4 class="page-title mb-0">Customer Balance </h4>
                 </div>
-
+                <div class="mb-3">
+                    <input type="text" id="customerSearch" class="form-control" placeholder="Search Customer by Name...">
+                </div>
                 <div class="row g-4">
                     <!-- Left Side: Customers -->
                     <div class="col-md-4">
@@ -74,7 +76,7 @@
                                             </tr>
                                         </thead>
                                         <tbody id="customerList">
-                                            @forelse($CustomerLedgers as $ledger)
+                                            @forelse($CustomerLedgers->sortBy('Customer.customer_name') as $ledger)
                                             <tr class="clickable-row" data-id="{{ $ledger->Customer->id }}">
                                                 <td><a href="#" class="customer-link">{{ $ledger->Customer->customer_name }}</a></td>
                                                 <td class="text-end text-success">{{ number_format($ledger->closing_balance, 0) }}</td>
@@ -170,7 +172,21 @@
         }
     </style>
 
+    <script>
+        document.getElementById("customerSearch").addEventListener("keyup", function() {
+            let query = this.value.toLowerCase();
+            let rows = document.querySelectorAll("#customerList tr");
 
+            rows.forEach(function(row) {
+                let customerName = row.querySelector(".customer-link")?.textContent.toLowerCase();
+                if (customerName && customerName.includes(query)) {
+                    row.style.display = "";
+                } else {
+                    row.style.display = "none";
+                }
+            });
+        });
+    </script>
     <script>
         $('.clickable-row').on('click', function() {
             let customerId = $(this).data('id');

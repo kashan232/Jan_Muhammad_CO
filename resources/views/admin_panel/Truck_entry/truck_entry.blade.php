@@ -48,7 +48,7 @@
                                 <!-- Vendor (Party) -->
                                 <div class="col-md-4 mt-2">
                                     <label>Vendor (Party)</label>
-                                    <select name="vendor_id" class="form-control">
+                                    <select name="vendor_id" class="select2-basic form-control">
                                         <option value="">Select Vendor</option>
                                         @foreach($vendors as $vendor)
                                         <option value="{{ $vendor->name }}">{{ $vendor->name }}</option>

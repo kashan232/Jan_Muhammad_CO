@@ -17,6 +17,7 @@ use App\Http\Controllers\UnitController;
 use App\Http\Controllers\WarehouseController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\PaymentController;
+use App\Http\Controllers\ReportController;
 use App\Http\Controllers\TruckEntryController;
 use App\Http\Controllers\UnitInController;
 use App\Http\Controllers\VendorController;
@@ -118,7 +119,7 @@ Route::post('/supplier-payment-store', [SupplierController::class, 'supplier_pay
 Route::get('/supplier-payment', [SupplierController::class, 'supplier_payment'])->name('supplier-payment');
 Route::get('/Supplier-balance', [SupplierController::class, 'Supplier_balance'])->middleware(['auth', 'admin'])->name('Supplier-balance');
 Route::get('/Supplier-balance-ledger/{id}', [SupplierController::class, 'Supplier_balance_ledger'])->name('Supplier-balance-ledger');
-
+Route::post('/toggle-supplier-status', [SupplierController::class, 'toggleStatus'])->name('toggle-supplier-status');
 //Staff
 Route::get('/staff', [StaffController::class, 'staff'])->middleware(['auth','admin'])->name('staff');
 Route::post('/store-staff', [StaffController::class, 'store_staff'])->name('store-staff');
@@ -207,7 +208,7 @@ Route::get('/daily-sale', [LotSaleController::class, 'daily_sale'])->middleware(
 Route::post('/daily-sale-report', [LotSaleController::class, 'getDailySales'])->name('daily.sales');
 
 Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('trucks-sold');
-
+Route::get('/delete-bill/{billId}', [LotSaleController::class, 'deleteBill'])->name('delete-bill');
 Route::get('/customer-sale', [LotSaleController::class, 'customer_sale'])->name('customer-sale');
 Route::get('/customer-lots', [LotSaleController::class, 'getCustomerLots'])->name('customer.lots');
 
@@ -229,6 +230,13 @@ Route::post('/customer-payment/store', [PaymentController::class, 'storeCustomer
 Route::get('/Vendor-payments', [PaymentController::class, 'Vendor_payments'])->middleware(['auth', 'admin'])->name('Vendor-payments');
 Route::post('/vendor-payment-store', [PaymentController::class, 'storeVendorPayment'])->name('vendor-payment-store');
 Route::get('/get-vendor-balance/{id}', [PaymentController::class, 'getVendorBalance'])->name('get-Vendor-balance');
+
+Route::get('/customer-ledger-report', [ReportController::class, 'customer_ledger_report'])->name('customer-ledger-report');
+Route::get('/fetch-Customer-ledger', [ReportController::class, 'fetchCustomerledger'])->name('fetch-Customer-ledger');
+
+Route::get('/Vendor-ledger-report', [ReportController::class, 'Vendor_ledger_report'])->name('Vendor-ledger-report');
+Route::get('/fetch-Vendor-ledger-report', [ReportController::class, 'fetch_Vendor_ledger_report'])->name('fetch-Vendor-ledger-report');
+
 
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -5,7 +5,7 @@
     <div class="page-wrapper default-version">
         @include('admin_panel.include.sidebar_include')
         @include('admin_panel.include.navbar_include')
-
+        <!-- Bootstrap alert container -->
         <div class="modal fade" id="addCustomerModal" tabindex="-1" aria-labelledby="addCustomerModalLabel" aria-hidden="true">
             <div class="modal-dialog">
                 <div class="modal-content">
@@ -53,6 +53,8 @@
                 </div>
                 <div class="card shadow-lg p-4">
                     <div class="card-body">
+                        <div id="alertContainer" class="mt-3"></div>
+
                         <form method="POST">
                             @csrf
                             <div class="row">
@@ -281,20 +283,19 @@
             updateSubtotal(); // Row remove hone ke baad subtotal update karega
         }
     </script>
-
     <script>
         document.getElementById("submitSale").addEventListener("click", function(event) {
-            event.preventDefault(); // Page reload hone se rokta hai
+            event.preventDefault();
 
             let salesData = [];
             document.querySelectorAll("#saleTable tbody tr").forEach(row => {
                 let saleType = row.querySelector(".sale-type").value;
                 let quantity = parseFloat(row.querySelector(".quantity").value);
                 let price = parseFloat(row.querySelector(".price").value);
-                let lotId = row.getAttribute("data-lot-id"); // Lot ID ko extract karein
+                let lotId = row.getAttribute("data-lot-id");
                 let weight = parseFloat(row.querySelector(".weight").value);
 
-                if (lotId) { // Ensure ke lot_id null na ho
+                if (lotId) {
                     salesData.push({
                         lot_id: lotId,
                         quantity: quantity,
@@ -325,35 +326,31 @@
                 .then(response => response.json())
                 .then(data => {
                     if (data.success) {
-                        Swal.fire({
-                            title: "Success!",
-                            text: data.message,
-                            icon: "success",
-                            showConfirmButton: false,
-                            timer: 2000
-                        }).then(() => {
-                            window.location.href = "{{ route('show-trucks') }}";
-                        });
+                        // Save message to sessionStorage
+                        sessionStorage.setItem('sale_success_message', data.message);
+                        // Reload the page
+                        location.reload();
                     } else {
-                        Swal.fire({
-                            title: "Error!",
-                            text: "Error: " + data.message,
-                            icon: "error",
-                            confirmButtonText: "Try Again"
-                        });
+                        alert("Error: " + data.message);
                     }
                 })
                 .catch(error => {
                     console.error("Error:", error);
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Something went wrong. Please try again.",
-                        icon: "error",
-                        confirmButtonText: "OK"
-                    });
+                    alert("Something went wrong. Please try again.");
                 });
-
         });
     </script>
-
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            let message = sessionStorage.getItem('sale_success_message');
+            if (message) {
+                document.getElementById("alertContainer").innerHTML = `
+                <div class="alert alert-success alert-dismissible fade show" role="alert">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>`;
+                sessionStorage.removeItem('sale_success_message');
+            }
+        });
+    </script>
 </body>

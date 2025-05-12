@@ -39,6 +39,8 @@
                                             @if($truck->bill_id)
                                             <a href="{{ route('view-vendor-bill', $truck->bill_id) }}" class="btn btn-secondary btn-sm">View Bill</a>
                                             <a href="{{ route('bill-book', $truck->bill_id) }}" class="btn btn-dark btn-sm">Bill Book</a>
+                                            <!-- Delete Bill Button -->
+                                            <button class="btn btn-warning btn-sm" onclick="confirmDelete({{ $truck->bill_id }})">Delete Bill</button>
                                             @else
                                             <a href="{{ route('Create-Bill', ['truck_id' => $truck->id, 'vendor_id' => $truck->vendor_id]) }}" class="btn btn-primary btn-sm">Create Bill</a>
 
@@ -61,6 +63,23 @@
 
     @include('admin_panel.include.footer_include')
 
-
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(billId) {
+            Swal.fire({
+                title: 'Are you sure?',
+                text: "This bill will be deleted and cannot be recovered!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'No, keep it',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Redirect to the delete route using the billId
+                    window.location.href = "{{ url('/delete-bill') }}/" + billId;
+                }
+            });
+        }
+    </script>
 </body>

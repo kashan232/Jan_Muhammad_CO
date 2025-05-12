@@ -30,13 +30,18 @@ class CustomerController extends Controller
 
     public function store_customer(Request $request)
     {
+        // Validate customer_name
+        $request->validate([
+            'customer_name' => 'required|string|max:255|unique:customers,customer_name',
+        ]);
 
         if (Auth::id()) {
             $userId = Auth::id();
+
             $customer = Customer::create([
                 'admin_or_user_id' => $userId,
                 'customer_name' => $request->customer_name,
-                'customer_name_urdu' => $request->customer_name_urdu, // Add this line
+                'customer_name_urdu' => $request->customer_name_urdu,
                 'customer_phone' => $request->customer_phone,
                 'city' => $request->city,
                 'area' => $request->area,
@@ -45,11 +50,13 @@ class CustomerController extends Controller
                 'created_at' => Carbon::now(),
                 'updated_at' => Carbon::now(),
             ]);
+
             CustomerLedger::create([
                 'admin_or_user_id' => $userId,
                 'customer_id' => $customer->id,
-                'previous_balance' => $request->opening_balance, // Pehli dafa opening balance = previous balance
-                'closing_balance' => $request->opening_balance, // Closing balance bhi initially same hoga
+                'opening_balance' => $request->opening_balance,
+                'previous_balance' => $request->opening_balance,
+                'closing_balance' => $request->opening_balance,
                 'created_at' => Carbon::now(),
             ]);
 
@@ -60,27 +67,72 @@ class CustomerController extends Controller
     }
     public function update_customer(Request $request)
     {
-        if (Auth::id()) {
-            $usertype = Auth()->user()->usertype;
-            $userId = Auth::id();
-            // dd($request);
-            $update_id = $request->input('customer_id');
-
-            Customer::where('id', $update_id)->update([
-                'customer_name' => $request->customer_name,
-                'customer_name_urdu' => $request->customer_name_urdu,
-                'customer_phone' => $request->customer_phone,
-                'city' => $request->city,
-                'area' => $request->area,
-                'customer_address' => $request->customer_address,
-                'opening_balance' => $request->opening_balance,
-                'updated_at' => Carbon::now(),
-            ]);
-            return redirect()->back()->with('success', 'Customer Updated Successfully');
-        } else {
+        if (!Auth::id()) {
             return redirect()->back();
         }
+
+        $update_id = $request->input('customer_id');
+
+        // Get existing customer
+        $customer = Customer::find($update_id);
+        if (!$customer) {
+            return redirect()->back()->with('error', 'Customer not found');
+        }
+
+        // Get old opening balance
+        $old_opening_balance = $customer->opening_balance;
+
+        // Get recap adjustment type and amount
+        $recape_type = $request->input('recape_type');
+        $recape_amount = $request->input('recape_opening_balance') ?? 0;
+
+        // Adjust the balance based on the selected type
+        if ($recape_type === 'plus') {
+            $new_opening_balance = $old_opening_balance + $recape_amount;
+        } elseif ($recape_type === 'minus') {
+            $new_opening_balance = $old_opening_balance - $recape_amount;
+        } else {
+            $new_opening_balance = $old_opening_balance;
+        }
+
+        // Update customer info
+        $customer->update([
+            'customer_name' => $request->customer_name,
+            'customer_name_urdu' => $request->customer_name_urdu,
+            'customer_phone' => $request->customer_phone,
+            'city' => $request->city,
+            'area' => $request->area,
+            'opening_balance' => $new_opening_balance,
+            'updated_at' => Carbon::now(),
+        ]);
+
+        // Update ledger
+        $latestLedger = CustomerLedger::where('customer_id', $update_id)
+            ->orderBy('id', 'desc')
+            ->first();
+
+        if ($latestLedger) {
+            $latestLedger->opening_balance = $new_opening_balance;
+            $latestLedger->closing_balance = ($recape_type === 'plus') ? $latestLedger->closing_balance + $recape_amount : $latestLedger->closing_balance - $recape_amount;
+            $latestLedger->updated_at = now();
+            $latestLedger->save();
+        } else {
+            CustomerLedger::create([
+                'admin_or_user_id' => Auth::id(),
+                'customer_id' => $update_id,
+                'previous_balance' => 0,
+                'opening_balance' => $new_opening_balance,
+                'closing_balance' => $new_opening_balance,
+                'created_at' => now(),
+                'updated_at' => now(),
+            ]);
+        }
+
+        return redirect()->back()->with('success', 'Customer Updated Successfully');
     }
+
+
+
 
     public function addCredit(Request $request)
     {

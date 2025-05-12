@@ -23,7 +23,7 @@
                     <div class="modal-body">
                         <form id="recoveryForm">
                             @csrf
-                            <input type="text" id="ledger_id" name="ledger_id">
+                            <input type="hidden" id="ledger_id" name="ledger_id">
                             <div class="mb-3">
                                 <label for="closing_balance" class="form-label">Closing Balance</label>
                                 <input type="text" class="form-control" id="closing_balance" name="closing_balance" readonly>
@@ -77,7 +77,8 @@
                                                 <td>{{ $ledger->customer_id }}</td>
                                                 <td>{{ $ledger->Customer->customer_name }}</td>
                                                 <td>{{ $ledger->Customer->customer_phone }}</td>
-                                                <td>{{ number_format($ledger->previous_balance, 0) }}</td>
+                                                <td>{{ number_format((float) $ledger->previous_balance, 0) }}</td>
+
                                                 <td id="closing_balance_{{ $ledger->id }}">{{ number_format($ledger->closing_balance, 0) }}</td>
                                                 <td>{{ $ledger->updated_at->format('Y-m-d H:i:s') }}</td>
                                                 <td>
@@ -104,41 +105,41 @@
         </div><!-- body-wrapper end -->
     </div>
     @include('admin_panel.include.footer_include')
-    
-<script>
-   document.addEventListener("DOMContentLoaded", function() {
-        var recoveryModal = document.getElementById('recoveryModal');
-        recoveryModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            var ledgerId = button.getAttribute('data-id');
-            var closingBalance = button.getAttribute('data-closing-balance');
 
-            document.getElementById('ledger_id').value = ledgerId;
-            document.getElementById('closing_balance').value = closingBalance;
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            var recoveryModal = document.getElementById('recoveryModal');
+            recoveryModal.addEventListener('show.bs.modal', function(event) {
+                var button = event.relatedTarget;
+                var ledgerId = button.getAttribute('data-id');
+                var closingBalance = button.getAttribute('data-closing-balance');
+
+                document.getElementById('ledger_id').value = ledgerId;
+                document.getElementById('closing_balance').value = closingBalance;
+            });
+
+            document.getElementById('recoveryForm').addEventListener('submit', function(event) {
+                event.preventDefault();
+
+                var formData = new FormData(this);
+                fetch("{{ route('customer-recovery-store') }}", {
+                        method: "POST",
+                        headers: {
+                            "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
+                        },
+                        body: formData
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.success) {
+                            var ledgerId = document.getElementById('ledger_id').value;
+                            var newClosingBalance = data.new_closing_balance;
+                            document.getElementById('closing_balance_' + ledgerId).innerText = newClosingBalance;
+                            var recoveryModal = bootstrap.Modal.getInstance(document.getElementById('recoveryModal'));
+                            recoveryModal.hide();
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            });
         });
-
-        document.getElementById('recoveryForm').addEventListener('submit', function(event) {
-            event.preventDefault();
-
-            var formData = new FormData(this);
-            fetch("{{ route('customer-recovery-store') }}", {
-                method: "POST",
-                headers: {
-                    "X-CSRF-TOKEN": document.querySelector('input[name="_token"]').value
-                },
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if(data.success) {
-                    var ledgerId = document.getElementById('ledger_id').value;
-                    var newClosingBalance = data.new_closing_balance;
-                    document.getElementById('closing_balance_' + ledgerId).innerText = newClosingBalance;
-                    var recoveryModal = bootstrap.Modal.getInstance(document.getElementById('recoveryModal'));
-                    recoveryModal.hide();
-                }
-            })
-            .catch(error => console.error('Error:', error));
-        });
-    });
-</script>
+    </script>

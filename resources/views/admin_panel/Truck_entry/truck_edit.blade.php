@@ -77,6 +77,7 @@
                                             <th>Size</th>
                                             <th>Unit In</th>
                                             <th>Lot Quantity</th>
+                                            <th>Update Lot</th> <!-- New Field -->
                                             <th>Action</th>
                                         </tr>
                                     </thead>
@@ -124,10 +125,12 @@
                                                 </select>
                                             </td>
                                             <td>
-                                                <input type="number" name="lot_quantity[]" class="form-control" value="{{ $lot->lot_quantity }}">
+                                                <input type="number" name="lot_quantity[]" class="form-control" value="{{ $lot->lot_quantity }}" readonly>
                                             </td>
                                             <td>
-                                                <!-- Optionally disable remove in edit -->
+                                                <input type="number" name="update_lot[]" class="form-control" value="0"> <!-- New Field -->
+                                            </td>
+                                            <td>
                                                 <button type="button" class="btn btn-danger remove-row"><i class="fas fa-trash"></i></button>
                                             </td>
                                         </tr>

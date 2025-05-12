@@ -214,6 +214,32 @@
                         <span class="menu-title">Vendors Payments</span>
                     </a><i class=""></i>
                 </li>
+
+                <li class="sidebar-menu-item sidebar-dropdown">
+                    <a  href="javascript:void(0)">
+                        <i class="menu-icon fas fa-shopping-basket"></i>
+                        <span class="menu-title"> Reports</span>
+                    </a>
+                    <div class="sidebar-submenu ">
+                        <ul>
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('customer-ledger-report') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> Customer Ledger Report </span>
+                                </a>
+                            </li>
+
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('Vendor-ledger-report') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> Vendor Ledger Report</span>
+                                </a>
+                            </li>
+                            
+                        </ul>
+                    </div>
+                </li>
+
                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>

@@ -125,16 +125,23 @@ class TruckEntryController extends Controller
         $truckEntry->vendor_id = $request->vendor_id;
         $truckEntry->entry_date = $request->entry_date;
         $truckEntry->save();
+
         // Loop through lot entries
         foreach ($request->category as $key => $category) {
             $variety = $request->variety[$key];
             $unit = $request->unit[$key];
             $unit_in = $request->unit_in[$key];
             $lot_quantity = $request->lot_quantity[$key];
+            $updateLotQuantity = $request->update_lot[$key] ?? 0; // Get update_lot, default to 0 if not present
 
             // 1. Check if lot_entry_id exists
             if (!empty($request->lot_entry_id[$key])) {
                 $lotEntry = LotEntry::findOrFail($request->lot_entry_id[$key]);
+                // Update existing entry
+                $lotEntry->lot_quantity += $updateLotQuantity;
+                // Assuming your LotEntry model has a 'total_units' field
+                $lotEntry->total_units += $updateLotQuantity;
+                $lotEntry->save();
             } else {
                 // 2. Try to find existing entry with same truck_id + all matching fields
                 $lotEntry = LotEntry::where('truck_id', $truckEntry->id)
@@ -143,22 +150,26 @@ class TruckEntryController extends Controller
                     ->where('unit', $unit)
                     ->where('unit_in', $unit_in)
                     ->first();
-            }
 
-            // 3. If found → update, else create new
-            if ($lotEntry) {
-                $lotEntry->lot_quantity = $lot_quantity;
-            } else {
-                $lotEntry = new LotEntry();
-                $lotEntry->truck_id = $truckEntry->id;
-                $lotEntry->category = $category;
-                $lotEntry->variety = $variety;
-                $lotEntry->unit = $unit;
-                $lotEntry->unit_in = $unit_in;
-                $lotEntry->lot_quantity = $lot_quantity;
+                // 3. If found → update, else create new
+                if ($lotEntry) {
+                    $lotEntry->lot_quantity += $updateLotQuantity;
+                    // Assuming your LotEntry model has a 'total_units' field
+                    $lotEntry->total_units += $updateLotQuantity;
+                    $lotEntry->save();
+                } else {
+                    $lotEntry = new LotEntry();
+                    $lotEntry->truck_id = $truckEntry->id;
+                    $lotEntry->category = $category;
+                    $lotEntry->variety = $variety;
+                    $lotEntry->unit = $unit;
+                    $lotEntry->unit_in = $unit_in;
+                    $lotEntry->lot_quantity = $lot_quantity + $updateLotQuantity;
+                    // Assuming your LotEntry model has a 'total_units' field
+                    $lotEntry->total_units = $lot_quantity + $updateLotQuantity;
+                    $lotEntry->save();
+                }
             }
-
-            $lotEntry->save();
         }
 
         return redirect()->back()->with('success', 'Truck Entry updated successfully');

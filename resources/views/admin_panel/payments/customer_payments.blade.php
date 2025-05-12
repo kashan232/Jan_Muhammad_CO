@@ -11,6 +11,7 @@
                     <h6 class="page-title">Customer Payments</h6>
                 </div>
 
+                @if (session()->has('success'))
                 <div class="alert alert-success">
                     <strong>Success!</strong> {{ session('success') }}.
                 </div>
@@ -24,7 +25,7 @@
                         <div class="row mb-3">
                             <div class="col-md-6">
                                 <label for="customer" class="form-label text-dark">Received From <span class="text-danger">*</span></label>
-                                <select id="customer" name="customer_id" class="form-select">
+                                <select id="customer" name="customer_id" class="form-select select2-basic">
                                     <option selected disabled>Select Customer</option>
                                     @foreach($customers as $customer)
                                     <option value="{{ $customer->id }}">{{ $customer->customer_name }}</option>
@@ -91,8 +92,7 @@
     <script>
         const routeTemplate = "{{ route('get.customer.balance', ['id' => 'CUSTOMER_ID']) }}";
 
-        document.getElementById('customer').addEventListener('change', function() {
-            let customerId = this.value;
+        function fetchCustomerData(customerId) {
             let url = routeTemplate.replace('CUSTOMER_ID', customerId);
 
             fetch(url)
@@ -116,6 +116,17 @@
                         tbody.innerHTML = '<tr><td colspan="2">No Sales Found</td></tr>';
                     }
                 });
+        }
+
+        $(document).ready(function() {
+            $('#customer').select2();
+
+            $('#customer').on('change', function() {
+                let customerId = $(this).val();
+                if (customerId) {
+                    fetchCustomerData(customerId);
+                }
+            });
         });
     </script>
 </body>

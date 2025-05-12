@@ -1,4 +1,15 @@
 @include('admin_panel.include.header_include')
+<style>
+    .badge.bg--success {
+        background-color: #28a745;
+        color: white;
+    }
+
+    .badge.bg--danger {
+        background-color: #dc3545;
+        color: white;
+    }
+</style>
 
 <body>
     <!-- page-wrapper start -->
@@ -28,6 +39,14 @@
                     <div class="col-lg-12">
                         <div class="card b-radius--10">
                             <div class="card-body p-0">
+                                @if ($errors->any())
+                                <div class="alert alert-danger">
+                                    @foreach ($errors->all() as $error)
+                                    <p>{{ $error }}</p>
+                                    @endforeach
+                                </div>
+                                @endif
+
                                 @if (session()->has('success'))
                                 <div class="alert alert-success">
                                     <strong>Success!</strong> {{ session('success') }}.
@@ -41,8 +60,8 @@
                                                 <th>Name</th>
                                                 <th>Urdu Name</th>
                                                 <th>Mobile</th>
-                                                <th>Payable</th>
-                                                <th>Receivable</th>
+                                                <th>Opening Balance</th>
+                                                <th>Status</th> {{-- New Column --}}
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
@@ -53,28 +72,39 @@
                                                 <td>{{ $Supplier->name }}</td>
                                                 <td>{{ $Supplier->urdu_name }}</td>
                                                 <td>
-                                                    <span class="fw-bold"> {{ $Supplier->mobile }} </span><br> <a href="#" class="__cf_email__">{{ $Supplier->email }}</a>
+                                                    <span class="fw-bold">{{ $Supplier->mobile }}</span><br>
+                                                    <a href="#" class="__cf_email__">{{ $Supplier->email }}</a>
                                                 </td>
-                                                <td>0</td>
-                                                <td>0</td>
+                                                <td>{{ $Supplier->opening_balance }}</td>
                                                 <td>
-                                                    <div class="button--group">
-                                                        <button type="button"
-                                                            class="btn btn-sm btn-outline--primary editCategoryBtn"
-                                                            data-toggle="modal" data-target="#exampleModal"
+                                                    <span class="badge {{ $Supplier->status == 0 ? 'bg--success' : 'bg--danger' }}">
+                                                        {{ $Supplier->status == 0 ? 'Active' : 'Disabled' }}
+                                                    </span>
+                                                </td>
+                                                <td>
+                                                    <div class="button--group d-flex align-items-center gap-2">
+                                                        <button type="button" class="btn btn-sm btn-outline--primary editCategoryBtn" data-toggle="modal" data-target="#exampleModal"
                                                             data-supplier-id="{{ $Supplier->id }}"
                                                             data-supplier-name="{{ $Supplier->name }}"
                                                             data-supplier-mobile="{{ $Supplier->mobile }}"
                                                             data-city="{{ $Supplier->city }}"
                                                             data-area="{{ $Supplier->area }}"
+                                                            data-opening-balance="{{ $Supplier->opening_balance }}"
                                                             data-supplier-urdu="{{ $Supplier->urdu_name }}">
                                                             <i class="la la-pencil"></i>Edit
                                                         </button>
+
+                                                        <div class="form-check form-switch">
+                                                            <input class="form-check-input toggle-supplier-status" type="checkbox"
+                                                                role="switch" data-id="{{ $Supplier->id }}" {{ $Supplier->status == 1 ? 'checked' : '' }}>
+                                                            <label class="form-check-label">Disable</label>
+                                                        </div>
                                                     </div>
                                                 </td>
                                             </tr>
                                             @endforeach
                                         </tbody>
+
                                     </table><!-- table end -->
                                 </div>
                             </div>
@@ -191,12 +221,33 @@
                                                 <input type="text" name="area" id="sup_area" class="form-control" autocomplete="off" value="">
                                             </div>
                                         </div>
+                                        <!-- Display only: Opening Balance (readonly) -->
                                         <div class="col-lg-6">
                                             <div class="form-group">
-                                                <label>Opening Balance</label>
-                                                <input type="number" name="opening_balance" class="form-control">
+                                                <label>Current Opening Balance</label>
+                                                <input type="number" class="form-control" readonly id="supplier_opening_balance">
                                             </div>
                                         </div>
+
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Adjustment Type</label>
+                                                <select name="adjustment_type" class="form-control" id="adjustment_type">
+                                                    <option value="">Select Adjustment</option>
+                                                    <option value="plus">Plus (+)</option>
+                                                    <option value="minus">Minus (-)</option>
+                                                </select>
+                                            </div>
+                                        </div>
+
+                                        <!-- Receipt Opening Balance -->
+                                        <div class="col-lg-6">
+                                            <div class="form-group">
+                                                <label>Receipt Opening Balance</label>
+                                                <input type="number" name="receipt_opening_balance" class="form-control" placeholder="Enter amount for adjustment">
+                                            </div>
+                                        </div>
+
 
                                     </div>
                                 </div>
@@ -213,27 +264,58 @@
         </div><!-- body-wrapper end -->
     </div>
     @include('admin_panel.include.footer_include')
-
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
-            // Edit category button click event
             $('.editCategoryBtn').click(function() {
-                // Extract category ID and name from data attributes
                 var supplierId = $(this).data('supplier-id');
-                var suppliername = $(this).data('supplier-name');
-                var suppliermobile = $(this).data('supplier-mobile');
-                var suppliercity = $(this).data('city');
-                var supplierarea = $(this).data('area');
-                var supplierurdu = $(this).data('supplier-urdu');
+                var supplierName = $(this).data('supplier-name');
+                var supplierMobile = $(this).data('supplier-mobile');
+                var supplierCity = $(this).data('city');
+                var supplierArea = $(this).data('area');
+                var supplierUrdu = $(this).data('supplier-urdu');
+                var supplierOpeningBalance = $(this).data('opening-balance');
 
-
+                // Populate the fields
                 $('#supplier_id').val(supplierId);
-                $('#suplier_name').val(suppliername);
-                $('#suplier_mobile').val(suppliermobile);
-                $('#sup_city').val(suppliercity);
-                $('#sup_area').val(supplierarea);
-                $('#supplier_urdu_name').val(supplierurdu);
+                $('#suplier_name').val(supplierName); // Ensure the correct ID here
+                $('#suplier_mobile').val(supplierMobile); // Ensure the correct ID here
+                $('#sup_city').val(supplierCity); // Ensure the correct ID here
+                $('#sup_area').val(supplierArea); // Ensure the correct ID here
+                $('#supplier_urdu_name').val(supplierUrdu); // Ensure the correct ID here
+                $('#supplier_opening_balance').val(supplierOpeningBalance); // Ensure the correct ID here
 
+                // Reset the adjustment fields
+                $('#adjustment_type').val('');
+                $('input[name="receipt_opening_balance"]').val('');
+            });
+        });
+    </script>
+
+    <script>
+        $('.toggle-supplier-status').change(function() {
+            var supplierId = $(this).data('id');
+            var newStatus = $(this).is(':checked') ? 1 : 0;
+
+            $.ajax({
+                url: "{{ route('toggle-supplier-status') }}",
+                method: "POST",
+                data: {
+                    _token: "{{ csrf_token() }}",
+                    id: supplierId,
+                    status: newStatus
+                },
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire('Updated!', response.message, 'success');
+                        location.reload();
+                    } else {
+                        Swal.fire('Error!', 'Something went wrong.', 'error');
+                    }
+                },
+                error: function(xhr) {
+                    Swal.fire('Error!', 'Could not connect to server.', 'error');
+                }
             });
         });
     </script>
