@@ -381,6 +381,48 @@ class LotSaleController extends Controller
         }
     }
 
+    public function daily_recovery()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+
+            return view('admin_panel.lot_sale.daily_recovery');
+        } else {
+            return redirect()->back();
+        }
+    }
+    public function getrecovery(Request $request)
+    {
+        $start = $request->start_date;
+        $end = $request->end_date;
+
+        $recoveries = DB::table('customer_recoveries')
+            ->join('customers', 'customer_recoveries.customer_ledger_id', '=', 'customers.id')
+            ->whereBetween('date', [$start, $end])
+            ->select(
+                'customers.customer_name',
+                'customer_recoveries.amount_paid',
+                'customer_recoveries.description',
+                'customer_recoveries.date',
+                'customer_recoveries.Bank'
+            )
+            ->get();
+
+        $data = $recoveries->map(function ($recovery) {
+            return [
+                'customer' => $recovery->customer_name,
+                'amount' => $recovery->amount_paid,
+                'description' => $recovery->description,
+                'date' => $recovery->date,
+                'payment_method' => $recovery->Bank,
+            ];
+        });
+
+        return response()->json($data);
+    }
+
+
+
     public function getDailySales(Request $request)
     {
         $start = $request->start_date;

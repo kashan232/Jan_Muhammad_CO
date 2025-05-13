@@ -203,6 +203,12 @@
                     </a><i class=""></i>
                 </li>
                 <li class="sidebar-menu-item">
+                    <a href="{{ route('daily-recovery') }}" class="nav-link">
+                        <i class="menu-icon fas fa-calendar-alt"></i>
+                        <span class="menu-title">Daily Recoveries</span>
+                    </a><i class=""></i>
+                </li>
+                <li class="sidebar-menu-item">
                     <a href="{{ route('customer-payments') }}" class="nav-link">
                         <i class="menu-icon fas fa-calendar-alt"></i>
                         <span class="menu-title">Customer Payments</span>

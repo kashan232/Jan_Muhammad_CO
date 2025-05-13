@@ -206,6 +206,9 @@ Route::post('/delete-lot-sale', [LotSaleController::class, 'deleteSale'])->name(
 Route::get('/cash-sale', [LotSaleController::class, 'cash_sale'])->middleware(['auth', 'admin'])->name('cash-sale');
 Route::get('/daily-sale', [LotSaleController::class, 'daily_sale'])->middleware(['auth', 'admin'])->name('daily-sale');
 Route::post('/daily-sale-report', [LotSaleController::class, 'getDailySales'])->name('daily.sales');
+Route::get('/daily-recovery', [LotSaleController::class, 'daily_recovery'])->middleware(['auth', 'admin'])->name('daily-recovery');
+Route::post('/daily-recovery-report', [LotSaleController::class, 'getrecovery'])->name('daily.recovery');
+
 
 Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('trucks-sold');
 Route::get('/delete-bill/{billId}', [LotSaleController::class, 'deleteBill'])->name('delete-bill');
