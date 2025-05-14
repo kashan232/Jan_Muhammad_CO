@@ -33,7 +33,7 @@
                     aria-haspopup="true" aria-expanded="false">
                     <span class="navbar-user">
                         <span class="navbar-user__thumb">
-                            <img src="assets/admin/images/user.png" alt="image"></span>
+                            <img src="{{ asset('assets/admin/images/user.png') }}" alt="image"></span>
                         <span class="navbar-user__info">
                             @if(Auth::check() && Auth::user()->usertype == 'admin')
                             <span class="navbar-user__name">Super Admin</span>

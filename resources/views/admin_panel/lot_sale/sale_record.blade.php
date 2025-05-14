@@ -92,21 +92,40 @@
                                                             <input type="hidden" name="sale_id" value="{{ $sale->id }}">
                                                             <div class="modal-content">
                                                                 <div class="modal-header">
-                                                                    <h5 class="modal-title" id="editModalLabel{{ $sale->id }}">Edit Sale - {{ $sale->customer_name }}</h5>
-                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    <h5 class="modal-title" id="editModalLabel{{ $sale->id }}">
+                                                                        Edit Sale - {{ $sale->customer_name }}
+                                                                    </h5>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                                                 </div>
                                                                 <div class="modal-body">
+                                                                    <!-- Current sold units (read‑only) -->
                                                                     <div class="mb-3">
-                                                                        <label for="quantity" class="form-label">Sold Units</label>
-                                                                        <input type="number" name="quantity" class="form-control" value="{{ $sale->quantity }}" required>
+                                                                        <label class="form-label">Sold Units</label>
+                                                                        <input type="number" class="form-control"
+                                                                            value="{{ $sale->quantity }}" readonly>
                                                                     </div>
+
+                                                                    <!-- NEW: Add Units -->
+                                                                    <div class="mb-3">
+                                                                        <label for="add_units" class="form-label">Add Units</label>
+                                                                        <input type="number" name="add_units" id="add_units"
+                                                                            class="form-control" value="0" min="0" required>
+                                                                        <div class="form-text">
+                                                                            Enter how many more units to sell (or 0 to leave unchanged).
+                                                                        </div>
+                                                                    </div>
+
                                                                     <div class="mb-3">
                                                                         <label for="price" class="form-label">Price</label>
-                                                                        <input type="number" name="price" step="0.01" class="form-control" value="{{ $sale->price }}" required>
+                                                                        <input type="number" name="price" step="0.01"
+                                                                            class="form-control" value="{{ $sale->price }}" required>
                                                                     </div>
+
                                                                     <div class="mb-3">
                                                                         <label for="sale_date" class="form-label">Sale Date</label>
-                                                                        <input type="date" name="sale_date" class="form-control" value="{{ \Carbon\Carbon::parse($sale->sale_date)->format('Y-m-d') }}" required>
+                                                                        <input type="date" name="sale_date" class="form-control"
+                                                                            value="{{ \Carbon\Carbon::parse($sale->sale_date)->format('Y-m-d') }}"
+                                                                            required>
                                                                     </div>
                                                                 </div>
                                                                 <div class="modal-footer">
@@ -114,6 +133,7 @@
                                                                 </div>
                                                             </div>
                                                         </form>
+
                                                     </div>
                                                 </div>
                                                 @endforeach

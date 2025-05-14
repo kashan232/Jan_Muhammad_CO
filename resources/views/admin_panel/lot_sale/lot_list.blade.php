@@ -69,9 +69,9 @@
                                 <div class="col-md-4 mb-3" id="customer_select" style="display: none;">
                                     <label for="customer" class="form-label">Select Customer</label>
                                     <div class="d-flex">
-                                        <select id="customer" class="select2-basic form-control" required>
+                                        <select id="customer" class="form-select select2-basic"  required>
                                             <option value="" selected disabled>Select Customer</option>
-                                            @foreach($customers as $customer)
+                                            @foreach($customers->sortBy('customer_name') as $customer)
                                             <option value="{{ $customer->id }}" data-number="{{ $customer->customer_phone }}">
                                                 {{ $customer->customer_name }}
                                             </option>

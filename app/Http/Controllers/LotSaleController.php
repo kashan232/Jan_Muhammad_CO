@@ -206,17 +206,68 @@ class LotSaleController extends Controller
         return view('admin_panel.lot_sale.sale_record', compact('lots', 'truck'));
     }
 
+
     public function updateLotSale(Request $request)
     {
+        $data = $request->validate([
+            'sale_id'   => 'required|exists:lot_sales,id',
+            'add_units' => 'required|integer|min:0',
+            'price'     => 'required|numeric|min:0',
+            'sale_date' => 'required|date',
+        ]);
 
-        $sale = LotSale::find($request->sale_id);
-        $sale->quantity = $request->quantity;
-        $sale->price = $request->price;
-        $sale->sale_date = $request->sale_date;
-        $sale->save();
+        $sale = LotSale::findOrFail($data['sale_id']);
+        $lot  = LotEntry::findOrFail($sale->lot_id);
 
-        return back()->with('success', 'Sale record updated successfully!');
+        $oldQty   = $sale->quantity;
+        $addUnits = $data['add_units'];
+        $delta    = $addUnits;
+
+        // 1) Ensure stock for an increase:
+        if ($delta > 0 && $lot->lot_quantity < $delta) {
+            return back()->withErrors([
+                'add_units' => "Only {$lot->lot_quantity} units remain in stock."
+            ]);
+        }
+
+        DB::transaction(function () use ($sale, $lot, $data, $oldQty, $addUnits, $delta) {
+            // 2) Update the sale record:
+            $newQty       = $oldQty + $addUnits;
+            $sale->quantity   = $newQty;
+            $sale->price      = $data['price'];
+            $sale->sale_date  = $data['sale_date'];
+            $sale->total      = $newQty * $data['price'];
+            $sale->save();
+
+            // 3) Adjust the lot’s stock:
+            $lot->lot_quantity = $lot->lot_quantity - $delta;
+            $lot->save();
+
+            // 4) If it's a credit sale, update the customer ledger:
+            if ($sale->customer_type === 'credit' && $sale->customer_id) {
+                // Fetch the most recent ledger entry for this customer
+                $ledger = CustomerLedger::where('customer_id', $sale->customer_id)
+                    ->latest('created_at')
+                    ->first();
+
+                if ($ledger) {
+                    $amount = $addUnits * $data['price'];
+
+                    // Move old closing to previous, then bump closing
+                    $ledger->previous_balance = $ledger->closing_balance;
+                    $ledger->closing_balance  = $ledger->closing_balance + $amount;
+                    $ledger->save();
+                }
+            }
+        });
+
+        return back()->with(
+            'success',
+            "Sale updated (+{$addUnits} units), stock adjusted, and ledger updated if applicable."
+        );
     }
+
+
     public function deleteSale(Request $request)
     {
         $lot_id = $request->lot_id;

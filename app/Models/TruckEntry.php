@@ -17,4 +17,9 @@ class TruckEntry extends Model
     {
         return $this->hasMany(LotEntry::class, 'truck_id', 'id'); // Change 'truck_entry_id' to 'truck_id'
     }
+
+    public function lotEntries()
+    {
+        return $this->hasMany(LotEntry::class, 'truck_id');
+    }
 }

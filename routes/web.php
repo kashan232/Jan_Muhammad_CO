@@ -190,6 +190,7 @@ Route::get('/Truck-Entry', [TruckEntryController::class, 'Truck_Entry'])->name('
 Route::post('/Truck-Entry/Store', [TruckEntryController::class, 'store'])->name('Truck-Entry.Store');
 Route::get('/Truck-Entries', [TruckEntryController::class, 'Truck_Enters'])->name('Truck-Entries');
 Route::get('/Truck-Entry/{id}', [TruckEntryController::class, 'show'])->name('Truck-Entry.Show');
+Route::delete('truck-entry/{id}', [TruckEntryController::class, 'destroy'])->name('Truck-Entry.Destroy');
 
 Route::get('/truck-entry/edit/{id}', [TruckEntryController::class, 'edit'])->name('Truck-Entry.Edit');
 Route::put('/truck_entries/{id}', [TruckEntryController::class, 'update'])->name('truck_entries.update');

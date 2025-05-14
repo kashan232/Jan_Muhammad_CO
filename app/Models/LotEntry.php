@@ -17,4 +17,9 @@ class LotEntry extends Model
     {
         return $this->belongsTo(TruckEntry::class, 'truck_id', 'id'); // Ensure correct foreign key
     }
+
+    public function sales()
+    {
+        return $this->hasMany(LotSale::class, 'lot_id');
+    }
 }
