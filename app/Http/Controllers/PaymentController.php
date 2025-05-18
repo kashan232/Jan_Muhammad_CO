@@ -47,7 +47,6 @@ class PaymentController extends Controller
 
     public function storeCustomerPayment(Request $request)
     {   
-        dd($request);
         $latestLedger = CustomerLedger::where('customer_id', $request->customer_id)
             ->latest('id')
             ->first();

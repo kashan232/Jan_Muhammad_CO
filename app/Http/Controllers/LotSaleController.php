@@ -117,7 +117,11 @@ class LotSaleController extends Controller
                 ], 400);
             }
 
-            $totalAmount = $sale['quantity'] * $sale['price'];
+            // Calculate Total Amount based on weight if available
+            $totalAmount = isset($sale['weight']) && $sale['weight'] !== null
+                ? $sale['weight'] * $sale['price']
+                : $sale['quantity'] * $sale['price'];
+
             $subTotal += $totalAmount;
 
             // Reduce Lot Quantity
@@ -472,6 +476,53 @@ class LotSaleController extends Controller
         return response()->json($data);
     }
 
+    public function daily_sale_truck_wise()
+    {
+        if (Auth::id()) {
+            $userId = Auth::id();
+
+            return view('admin_panel.lot_sale.daily_sale_truck_wise');
+        } else {
+            return redirect()->back();
+        }
+    }
+
+    public function daily_sale_truck_report(Request $request)
+    {
+        // 1) Validate inputs
+        $data = $request->validate([
+            'start_date' => 'required|date',
+            'end_date'   => 'required|date|after_or_equal:start_date',
+        ]);
+
+        // 2) Build & execute query
+        $rows = LotSale::whereBetween('lot_sales.sale_date', [$data['start_date'], $data['end_date']])
+            ->join('lot_entries',   'lot_sales.lot_id',      '=', 'lot_entries.id')
+            ->join('truck_entries', 'lot_entries.truck_id',  '=', 'truck_entries.id')
+            ->leftJoin('customers', 'lot_sales.customer_id', '=', 'customers.id')
+            ->select([
+                'truck_entries.truck_number',
+                // “Cash” when type=cash, otherwise customer_name
+                DB::raw("
+                    CASE
+                        WHEN lot_sales.customer_type = 'cash' THEN 'Cash'
+                        ELSE customers.customer_name
+                    END AS customer_name
+                "),
+                DB::raw('SUM(lot_sales.quantity) AS total_quantity'),
+            ])
+            // Must GROUP BY every non-aggregated column or expression
+            ->groupBy(
+                'truck_entries.truck_number',
+                'lot_sales.customer_type',
+                'customers.customer_name'
+            )
+            ->orderBy('truck_entries.truck_number')
+            ->get();
+
+        // 3) Return JSON
+        return response()->json($rows);
+    }
 
 
     public function getDailySales(Request $request)
@@ -488,16 +539,18 @@ class LotSaleController extends Controller
             ->get();
 
         $data = $sales->map(function ($sale) {
+            $weight = $sale->weight ?? 0;
+            $quantity = $sale->quantity ?? 0;
+
             return [
-                'customer' => $sale->customer_type === 'cash'
-                    ? 'Cash'
-                    : ($sale->customer->customer_name ?? 'N/A'),
+                'customer' => $sale->customer_type === 'cash' ? 'Cash' : ($sale->customer->customer_name ?? 'N/A'),
                 'truck_number' => $sale->lot->truckEntry->truck_number ?? 'N/A',
                 'category' => $sale->lot->category ?? 'N/A',
                 'variety' => $sale->lot->variety ?? 'N/A',
                 'unit' => $sale->lot->unit ?? 'N/A',
                 'unit_in' => $sale->lot->unit_in ?? 'N/A',
-                'quantity' => $sale->quantity,
+                'quantity' => $quantity,   // direct quantity dikhao
+                'weight' => $weight,       // direct weight dikhao
                 'price' => $sale->price,
                 'total' => $sale->total,
                 'sale_date' => $sale->sale_date,
@@ -506,6 +559,7 @@ class LotSaleController extends Controller
 
         return response()->json($data);
     }
+
 
     public function Create_Bill($truck_id, $vendor_id)
     {

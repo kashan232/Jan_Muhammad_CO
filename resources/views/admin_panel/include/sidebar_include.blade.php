@@ -203,6 +203,12 @@
                     </a><i class=""></i>
                 </li>
                 <li class="sidebar-menu-item">
+                    <a href="{{ route('daily-sale-truck-wise') }}" class="nav-link">
+                        <i class="menu-icon fas fa-calendar-alt"></i>
+                        <span class="menu-title">Daily Sale Truck </span>
+                    </a><i class=""></i>
+                </li>
+                <li class="sidebar-menu-item">
                     <a href="{{ route('daily-recovery') }}" class="nav-link">
                         <i class="menu-icon fas fa-calendar-alt"></i>
                         <span class="menu-title">Daily Recoveries</span>

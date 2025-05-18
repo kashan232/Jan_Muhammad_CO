@@ -209,6 +209,8 @@ Route::get('/daily-sale', [LotSaleController::class, 'daily_sale'])->middleware(
 Route::post('/daily-sale-report', [LotSaleController::class, 'getDailySales'])->name('daily.sales');
 Route::get('/daily-recovery', [LotSaleController::class, 'daily_recovery'])->middleware(['auth', 'admin'])->name('daily-recovery');
 Route::post('/daily-recovery-report', [LotSaleController::class, 'getrecovery'])->name('daily.recovery');
+Route::get('/daily-sale-truck-wise', [LotSaleController::class, 'daily_sale_truck_wise'])->middleware(['auth', 'admin'])->name('daily-sale-truck-wise');
+Route::post('/daily-sale-truck-report', [LotSaleController::class, 'daily_sale_truck_report'])->name('daily.truck.sale');
 
 
 Route::get('/trucks-sold', [LotSaleController::class, 'trucks_sold'])->name('trucks-sold');

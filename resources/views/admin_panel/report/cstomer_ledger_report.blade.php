@@ -182,7 +182,7 @@
                         let ledgerHTML = "";
 
                         // Opening Balance Row in <thead>
-                        $('#openingBalance').text(`Rs. ${openingBalance.toFixed(2)}`);
+                        $('#openingBalance').text(`Rs. ${Math.round(openingBalance)}`);
 
                         let balance = openingBalance; // Initialize balance with opening balance
 
@@ -195,36 +195,36 @@
                                 balance += debitAmount; // Add debit to balance
                                 totalDebit += debitAmount;
                                 ledgerHTML += `
-                            <tr>
-                                <td>${formatDate(entry.date)}</td>
-                                <td>-</td>
-                                <td>Sale</td>
-                                <td>Rs. ${debitAmount.toFixed(2)}</td>
-                                <td>-</td>
-                                <td class="fw-bold ${balance < 0 ? 'text-danger' : 'text-success'}">Rs. ${balance.toFixed(2)}</td>
-                            </tr>`;
+                    <tr>
+                        <td>${formatDate(entry.date)}</td>
+                        <td>-</td>
+                        <td>Sale</td>
+                        <td>Rs. ${Math.round(debitAmount)}</td>
+                        <td>-</td>
+                        <td class="fw-bold ${balance < 0 ? 'text-danger' : 'text-success'}">Rs. ${Math.round(balance)}</td>
+                    </tr>`;
                             }
 
                             if (creditAmount) {
                                 balance -= creditAmount; // Subtract credit from balance
                                 totalCredit += creditAmount;
                                 ledgerHTML += `
-                            <tr>
-                                <td>${formatDate(entry.date)}</td>
-                                <td>-</td>
-                                <td>Recovery</td>
-                                <td>-</td>
-                                <td>Rs. ${creditAmount.toFixed(2)}</td>
-                                <td class="fw-bold ${balance < 0 ? 'text-danger' : 'text-success'}">Rs. ${balance.toFixed(2)}</td>
-                            </tr>`;
+                    <tr>
+                        <td>${formatDate(entry.date)}</td>
+                        <td>-</td>
+                        <td>Recovery</td>
+                        <td>-</td>
+                        <td>Rs. ${Math.round(creditAmount)}</td>
+                        <td class="fw-bold ${balance < 0 ? 'text-danger' : 'text-success'}">Rs. ${Math.round(balance)}</td>
+                    </tr>`;
                             }
                         });
 
                         // Update the table with the generated HTML
                         $('#ledgerData').html(ledgerHTML);
-                        $('#totalDebit').text(`Rs. ${totalDebit.toFixed(2)}`);
-                        $('#totalCredit').text(`Rs. ${totalCredit.toFixed(2)}`);
-                        $('#closingBalance').text(`Rs. ${balance.toFixed(2)}`);
+                        $('#totalDebit').text(`Rs. ${Math.round(totalDebit)}`);
+                        $('#totalCredit').text(`Rs. ${Math.round(totalCredit)}`);
+                        $('#closingBalance').text(`Rs. ${Math.round(balance)}`);
                     }
                 });
             });
