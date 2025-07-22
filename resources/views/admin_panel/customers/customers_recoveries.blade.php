@@ -25,7 +25,7 @@
                         <div class="card b-radius--10">
                             <div class="card-body p-0">
                                 <div class="table-responsive--sm table-responsive">
-                                    <table class="table--light style--two table">
+                                    <table id="example" class="display  table table--light" style="width:100%">
                                         <thead>
                                             <tr>
                                                 <th>#</th>
@@ -55,6 +55,9 @@
                                             @endif
                                         </tbody>
                                     </table>
+                                    <div class="d-flex justify-content-center mt-3">
+                                        {{ $Recoveries->links('pagination::bootstrap-5') }}
+                                    </div>
                                 </div>
                             </div>
                         </div>

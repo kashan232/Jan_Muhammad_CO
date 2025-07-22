@@ -86,10 +86,8 @@ class TruckEntryController extends Controller
     {
         if (Auth::id()) {
             $userId = Auth::id();
-
             // Truck entries fetch karna
             $truckEntries = TruckEntry::with('lots')->orderBy('id', 'desc')->get();
-
             return view('admin_panel.Truck_entry.truck_enteries', compact('truckEntries'));
         } else {
             return redirect()->back();

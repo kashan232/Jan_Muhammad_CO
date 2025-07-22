@@ -12,8 +12,12 @@
                 </div>
                 <div class="card shadow-lg p-4">
                     <div class="card-body">
-                        <form method="POST" id="billForm" onsubmit="return validateBill()">
+                        <form id="billForm" onsubmit="return validateBill()">
                             @csrf
+                            <div>
+                                <label>Bill Date</label>
+                                <input type="date" class="form-control" name="bill_date" id="bill_date" required>
+                            </div>
                             <h4 class="fw-bold text-primary mt-4">Create Bill For Vendor (Truck: {{ $truck->truck_number }})</h4>
                             <input type="hidden" name="truck_id" value="{{ $truck->id }}">
                             <input type="hidden" name="truck_number" value="{{ $truck->truck_number }}">
@@ -66,6 +70,7 @@
                                             <th>Bill Type</th>
                                             <th>Total Units</th>
                                             <th>Total Weight</th> <!-- New Column -->
+                                            <th>Sale Type</th>
                                             <th>Sale Units</th>
                                             <th>Rate</th>
                                             <th>Amount</th>
@@ -179,6 +184,12 @@
     <td>
         <input type="number" name="weight[]" class="form-control weight" step="any" min="0" value="${total_weight}" required>
     </td>
+    <td>
+        <select name="calc_type[]" class="form-control calc-type" style="width:130px;">
+            <option value="unit">Sale in Unit</option>
+            <option value="kg">Sale in KG</option>
+        </select>
+    </td>
     <td><input type="number" name="sale_units[]" style="width:130px;" class="form-control sale-units" min="1" max="${total_units}" required></td>
     <td><input type="number" name="rate[]"  style="width:130px;" class="form-control rate" min="1" required></td>
     <td><input type="number" name="amount[]" style="width:130px;" class="form-control amount" readonly></td>
@@ -188,8 +199,10 @@
 
             billRow.querySelector('.sale-units').addEventListener('input', updateRowAmount);
             billRow.querySelector('.rate').addEventListener('input', updateRowAmount);
+            billRow.querySelector('.calc-type').addEventListener('change', updateRowAmount);
+            billRow.querySelector('.weight').addEventListener('input', updateRowAmount); // 👈 THIS LINE
 
-            addMazdoriRow(id, total_units, unit_in);
+            addMazdoriRow(id, total_units, unit_in); // this must execute
         }
 
         function copyMazdori() {
@@ -200,12 +213,22 @@
 
         function updateRowAmount(e) {
             const row = e.target.closest('tr');
+            const calcType = row.querySelector('.calc-type').value;
             const units = parseFloat(row.querySelector('.sale-units').value) || 0;
             const rate = parseFloat(row.querySelector('.rate').value) || 0;
-            const amount = units * rate;
+            const weight = parseFloat(row.querySelector('.weight').value) || 0;
+
+            let amount = 0;
+            if (calcType === 'kg') {
+                amount = weight * rate;
+            } else {
+                amount = units * rate;
+            }
+
             row.querySelector('.amount').value = Math.round(amount);
             calculateTotal();
         }
+
 
         function calculateTotal() {
             let total = 0;
@@ -357,6 +380,7 @@
             e.preventDefault();
 
             const form = e.target;
+            const date = form.querySelector('input[name="bill_date"]').value;
             const truckId = form.querySelector('input[name="truck_id"]').value;
             const trucknumber = form.querySelector('input[name="truck_number"]').value;
             const vendorId = form.querySelector('input[name="vendor_id"]').value;
@@ -390,6 +414,7 @@
             });
 
             const payload = {
+                date: date,
                 truck_id: truckId,
                 trucknumber: trucknumber,
                 vendorId: vendorId,
@@ -411,13 +436,10 @@
                 })
                 .then(response => response.json())
                 .then(data => {
-                    console.log(data);
-
                     if (data.success) {
                         Swal.fire('Success', data.message, 'success').then(() => {
-                            setTimeout(() => {
-                                window.location.href = "{{ route('trucks-sold') }}"; // 👈 Replace with your actual route
-                            }, 3000); // 5 seconds
+                            // ✅ Direct redirect without timeout (recommended)
+                            window.location.href = "{{ route('trucks-sold') }}";
                         });
                     } else {
                         Swal.fire('Error', data.message, 'error');
@@ -427,7 +449,6 @@
                     console.error(error);
                     Swal.fire('Error', 'Something went wrong with the request.', 'error');
                 });
-
 
         });
     </script>

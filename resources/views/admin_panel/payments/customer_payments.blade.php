@@ -34,7 +34,7 @@
                             </div>
                             <div class="col-md-6">
                                 <label for="amount" class="form-label text-dark">Payment Amount (PKR) <span class="text-danger">*</span></label>
-                                <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter payment amount">
+                                <input type="number" id="amount" name="amount" class="form-control" placeholder="Enter payment amount" required>
                             </div>
                         </div>
 

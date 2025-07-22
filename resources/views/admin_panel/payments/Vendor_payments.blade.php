@@ -21,7 +21,6 @@
 
                     <form action="{{ route('vendor-payment-store') }}" method="POST">
                         @csrf
-
                         {{-- Vendor and Payment Amount --}}
                         <div class="row mb-3">
                             <div class="col-md-6">
@@ -92,7 +91,7 @@
     @include('admin_panel.include.footer_include')
     <script>
         function fetchSupplierData(supplierId) {
-            let url = "{{ route('get-Vendor-balance', ['id' => 'SUPPLIER_ID']) }}".replace('SUPPLIER_ID', supplierId);
+            let url = "{{ route('get-Vendor-balance', ['id' => 'VENDORID']) }}".replace('VENDORID', vendorId);
 
             fetch(url)
                 .then(response => response.json())

@@ -17,7 +17,7 @@
                 </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-truck"></i>
                         <span class="menu-title">Products</span>
                     </a>
@@ -57,7 +57,7 @@
 
 
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-user-friends"></i>
                         <span class="menu-title">Customer</span>
                     </a>
@@ -100,11 +100,11 @@
 
                         </ul>
                     </div>
-                </li>  
+                </li>
 
-                
+
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-user-check"></i>
                         <span class="menu-title">Vendor</span>
                     </a>
@@ -139,10 +139,10 @@
                             </li>
                         </ul>
                     </div>
-                </li>  
+                </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-truck"></i>
                         <span class="menu-title">Truck Entry</span>
                     </a>
@@ -166,7 +166,7 @@
                 </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-shopping-basket"></i>
                         <span class="menu-title"> Sale</span>
                     </a>
@@ -185,7 +185,7 @@
                                     <span class="menu-title"> Sold Truck </span>
                                 </a>
                             </li>
-                            
+
                         </ul>
                     </div>
                 </li>
@@ -228,7 +228,7 @@
                 </li>
 
                 <li class="sidebar-menu-item sidebar-dropdown">
-                    <a  href="javascript:void(0)">
+                    <a href="javascript:void(0)">
                         <i class="menu-icon fas fa-shopping-basket"></i>
                         <span class="menu-title"> Reports</span>
                     </a>
@@ -247,12 +247,18 @@
                                     <span class="menu-title"> Vendor Ledger Report</span>
                                 </a>
                             </li>
-                            
+                            <li class="sidebar-menu-item ">
+                                <a class="nav-link" href="{{ route('Market-credit-report') }}">
+                                    <i class="menu-icon las la-dot-circle"></i>
+                                    <span class="menu-title"> Market Credit Report </span>
+                                </a>
+                            </li>
+
                         </ul>
                     </div>
                 </li>
 
-               <!-- <li class="sidebar-menu-item sidebar-dropdown">
+                <!-- <li class="sidebar-menu-item sidebar-dropdown">
                     <a class="" href="javascript:void(0)">
                         <i class="menu-icon las la-users"></i>
                         <span class="menu-title">Manage Staff</span>
@@ -342,12 +348,12 @@
                     </a>
                 </li> -->
 
-                
 
 
 
 
-                 <!-- <li class="sidebar-menu-item">
+
+                <!-- <li class="sidebar-menu-item">
                     <a href="{{ route('supplier') }}" class="nav-link">
                         <i class="menu-icon la la-user-friends"></i>
                         <span class="menu-title">Supplier</span>

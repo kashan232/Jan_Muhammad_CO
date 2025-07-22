@@ -25,7 +25,7 @@ class PaymentController extends Controller
     public function getCustomerBalance($id)
     {
         $customer = Customer::with(['lotSales' => function ($q) {
-            $q->select('id', 'customer_id', 'sale_date', 'total')->latest()->take(10);
+            $q->select('id', 'customer_id', 'sale_date', 'total')->latest()->take(5);
         }])->find($id);
 
         if (!$customer) {

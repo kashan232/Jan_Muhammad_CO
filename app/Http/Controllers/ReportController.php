@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\Customer;
+use App\Models\CustomerLedger;
 use App\Models\Supplier;
 use App\Models\Vendor;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class ReportController extends Controller
@@ -108,12 +110,6 @@ class ReportController extends Controller
         ]);
     }
 
-
-
-
-
-
-
     public function Vendor_ledger_report()
     {
         $Vendors = Supplier::get();
@@ -168,6 +164,85 @@ class ReportController extends Controller
             'supplier_name' => $supplierName,
             'startDate' => $startDate,
             'endDate' => $endDate,
+        ]);
+    }
+
+    public function Marketcreditreport()
+    {
+        $userId = Auth::id();
+
+        // Fetch customers with their latest ledger balances
+        $startDate = request('start_date');
+        $endDate = request('end_date');
+
+        $customers = Customer::where('admin_or_user_id', $userId)->get();
+        return view('admin_panel.report.Marketcreditreport', compact('customers'));
+    }
+
+    public function getCustomerLedgerSummary(Request $request)
+    {
+        $startDate = $request->start_date;
+        $endDate = $request->end_date;
+        $customerId = $request->customer_id;
+
+        $customers = [];
+
+        // All Customers
+        if ($customerId === 'All') {
+            $customers = Customer::all();
+        } else {
+            $customer = Customer::find($customerId);
+            if (!$customer) {
+                return response()->json(['success' => false, 'message' => 'Customer not found']);
+            }
+            $customers = collect([$customer]); // Make it iterable
+        }
+
+        $report = [];
+
+        foreach ($customers as $customer) {
+            $ledger = DB::table('customer_ledgers')
+                ->where('customer_id', $customer->id)
+                ->select('id', 'opening_balance')
+                ->first();
+
+            $ledgerId = $ledger->id ?? null;
+            $initialOpeningBalance = $ledger->opening_balance ?? 0;
+
+            $prevSales = DB::table('lot_sales')
+                ->where('customer_id', $customer->id)
+                ->where('sale_date', '<', $startDate)
+                ->sum('total');
+
+            $prevRecoveries = DB::table('customer_recoveries')
+                ->where('customer_ledger_id', $ledgerId)
+                ->where('date', '<', $startDate)
+                ->sum('amount_paid');
+
+            $openingBalance = $initialOpeningBalance + ($prevSales - $prevRecoveries);
+
+            $sales = DB::table('lot_sales')
+                ->where('customer_id', $customer->id)
+                ->whereBetween('sale_date', [$startDate, $endDate])
+                ->sum('total');
+
+            $recoveries = DB::table('customer_recoveries')
+                ->where('customer_ledger_id', $ledgerId)
+                ->whereBetween('date', [$startDate, $endDate])
+                ->sum('amount_paid');
+
+            $closingBalance = $openingBalance - $sales + $recoveries;
+
+            $report[] = [
+                'customer_name' => $customer->customer_name,
+                'customer_name_urdu' => $customer->customer_name_urdu,
+                'closing_balance' => round($closingBalance),
+            ];
+        }
+
+        return response()->json([
+            'success' => true,
+            'data' => $report,
         ]);
     }
 }

@@ -228,6 +228,7 @@ Route::get('/bill-book/view/{id}', [LotSaleController::class, 'bill_book'])->nam
 Route::get('/Customer-balance', [CustomerController::class, 'Customer_balance'])->middleware(['auth', 'admin'])->name('Customer-balance');
 Route::get('/customer-ledger/{id}', [CustomerController::class, 'fetchLedger'])->name('customer.ledger');
 Route::get('/lot/sale/{id}', [CustomerController::class, 'getLotDetails'])->name('lot.sale.details');
+Route::post('/delete-recovery', [CustomerController::class, 'deleteRecovery'])->name('delete.recovery');
 
 Route::get('/customer-payments', [PaymentController::class, 'customer_payments'])->middleware(['auth', 'admin'])->name('customer-payments');
 Route::get('/get-customer-balance/{id}', [PaymentController::class, 'getCustomerBalance'])->name('get.customer.balance');
@@ -242,6 +243,9 @@ Route::get('/fetch-Customer-ledger', [ReportController::class, 'fetchCustomerled
 
 Route::get('/Vendor-ledger-report', [ReportController::class, 'Vendor_ledger_report'])->name('Vendor-ledger-report');
 Route::get('/fetch-Vendor-ledger-report', [ReportController::class, 'fetch_Vendor_ledger_report'])->name('fetch-Vendor-ledger-report');
+
+Route::get('/Market-credit-report', [ReportController::class, 'Marketcreditreport'])->name('Market-credit-report');
+Route::post('/get-customer-ledger-summary', [ReportController::class, 'getCustomerLedgerSummary'])->name('get.customer.ledger.summary');
 
 
 Route::middleware('auth')->group(function () {

@@ -114,6 +114,7 @@
     </div>
 
     @include('admin_panel.include.footer_include')
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <style>
         .clickable-row:hover {
@@ -207,8 +208,17 @@
 
                     let ledgerRows = response.map(entry => {
                         let isSale = entry.type.toLowerCase() === 'sale';
+                        let isRecovery = entry.type.toLowerCase() === 'recovery';
                         let rowClass = isSale ? 'sale-row clickable-sale' : '';
                         let dataAttr = isSale ? `data-lot-id="${entry.id}"` : '';
+
+                        let deleteBtn = isRecovery ? `
+        <button class="btn btn-sm btn-danger delete-recovery-btn" 
+                data-recovery-id="${entry.id}" 
+                data-customer-id="${customerId}" 
+                data-amount="${entry.amount}">
+            Delete
+        </button>` : '';
 
                         return `
         <tr class="${rowClass}" ${dataAttr}>
@@ -216,9 +226,11 @@
             <td>${entry.type}</td>
             <td>Rs. ${entry.amount ? Number(entry.amount).toLocaleString() : '-'}</td>
             <td>${entry.remarks ?? '-'}</td>
+            <td>${deleteBtn}</td>
         </tr>
     `;
                     }).join('');
+
 
                     $('#customerDetailContent').html(`
                 <div class="table-responsive">
@@ -229,6 +241,7 @@
                                 <th>Type</th>
                                 <th>Amount</th>
                                 <th>Remarks</th>
+                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody class="text-center">
@@ -266,6 +279,57 @@
                 },
                 error: function() {
                     $('#customerDetailContent').html(`<div class="alert alert-danger">Failed to load ledger data.</div>`);
+                }
+            });
+        });
+
+        $(document).on('click', '.delete-recovery-btn', function() {
+            let recoveryId = $(this).data('recovery-id');
+            let customerId = $(this).data('customer-id');
+            let amount = $(this).data('amount');
+
+            Swal.fire({
+                title: 'Are you sure?',
+                text: 'This recovery will be permanently deleted!',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Yes, delete it!',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: '{{ route("delete.recovery") }}',
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            recovery_id: recoveryId,
+                            customer_id: customerId,
+                            amount: amount
+                        },
+                        success: function(response) {
+                            Swal.fire({
+                                icon: 'success',
+                                title: 'Deleted!',
+                                text: response.message,
+                                timer: 2000,
+                                showConfirmButton: false
+                            });
+
+                            // Auto reload after 2 seconds
+                            setTimeout(function() {
+                                location.reload();
+                            }, 2000);
+                        },
+                        error: function() {
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Error',
+                                text: 'Failed to delete recovery.',
+                            });
+                        }
+                    });
                 }
             });
         });

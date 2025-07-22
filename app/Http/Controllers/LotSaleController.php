@@ -41,14 +41,14 @@ class LotSaleController extends Controller
     {
         $trucks = DB::table('truck_entries')
             ->leftJoin('lot_entries', 'truck_entries.id', '=', 'lot_entries.truck_id')
-            ->leftJoin('vendor_bills', 'truck_entries.id', '=', 'vendor_bills.truck_id') // 👈 JOIN vendor_bills
+            ->leftJoin('vendor_bills', 'truck_entries.id', '=', 'vendor_bills.truck_id')
             ->select(
                 'truck_entries.id',
                 'truck_entries.truck_number',
                 'truck_entries.vendor_id',
                 'truck_entries.entry_date',
                 DB::raw('SUM(lot_entries.lot_quantity) as total_units'),
-                'vendor_bills.id as bill_id' // 👈 check if bill exists
+                'vendor_bills.id as bill_id'
             )
             ->groupBy(
                 'truck_entries.id',
@@ -58,10 +58,12 @@ class LotSaleController extends Controller
                 'vendor_bills.id'
             )
             ->having('total_units', '<=', 0)
+            ->orderBy('truck_entries.id', 'desc') // 👈 Sort by latest
             ->get();
 
         return view('admin_panel.lot_sale.trucks_sold', compact('trucks'));
     }
+
 
 
     public function deleteBill($billId)
@@ -218,48 +220,58 @@ class LotSaleController extends Controller
             'add_units' => 'required|integer|min:0',
             'price'     => 'required|numeric|min:0',
             'sale_date' => 'required|date',
+            'weight'    => 'nullable|numeric|min:0', // Accept optional weight
         ]);
 
         $sale = LotSale::findOrFail($data['sale_id']);
         $lot  = LotEntry::findOrFail($sale->lot_id);
 
-        $oldQty   = $sale->quantity;
-        $addUnits = $data['add_units'];
-        $delta    = $addUnits;
+        $oldQty    = $sale->quantity;
+        $addUnits  = $data['add_units'];
+        $delta     = $addUnits;
+        $oldWeight = $sale->weight;
+        $newWeight = $data['weight'] ?? null;
 
-        // 1) Ensure stock for an increase:
         if ($delta > 0 && $lot->lot_quantity < $delta) {
             return back()->withErrors([
                 'add_units' => "Only {$lot->lot_quantity} units remain in stock."
             ]);
         }
 
-        DB::transaction(function () use ($sale, $lot, $data, $oldQty, $addUnits, $delta) {
-            // 2) Update the sale record:
-            $newQty       = $oldQty + $addUnits;
+        DB::transaction(function () use ($sale, $lot, $data, $oldQty, $addUnits, $delta, $oldWeight, $newWeight) {
+
+            // 1) Compute old total
+            $oldTotal = ($oldWeight !== null)
+                ? $oldWeight * $sale->price
+                : $sale->quantity * $sale->price;
+
+            // 2) Update sale record
+            $newQty = $oldQty + $addUnits;
+
             $sale->quantity   = $newQty;
             $sale->price      = $data['price'];
             $sale->sale_date  = $data['sale_date'];
-            $sale->total      = $newQty * $data['price'];
+            $sale->weight     = $newWeight; // Can be null or a number
+            $sale->total      = ($newWeight !== null)
+                ? $newWeight * $data['price']
+                : $newQty * $data['price'];
             $sale->save();
 
-            // 3) Adjust the lot’s stock:
+            // 3) Adjust lot stock
             $lot->lot_quantity = $lot->lot_quantity - $delta;
             $lot->save();
 
-            // 4) If it's a credit sale, update the customer ledger:
+            // 4) Ledger update if applicable
             if ($sale->customer_type === 'credit' && $sale->customer_id) {
-                // Fetch the most recent ledger entry for this customer
                 $ledger = CustomerLedger::where('customer_id', $sale->customer_id)
                     ->latest('created_at')
                     ->first();
 
                 if ($ledger) {
-                    $amount = $addUnits * $data['price'];
+                    $newTotal = $sale->total;
 
-                    // Move old closing to previous, then bump closing
                     $ledger->previous_balance = $ledger->closing_balance;
-                    $ledger->closing_balance  = $ledger->closing_balance + $amount;
+                    $ledger->closing_balance  = $ledger->closing_balance - $oldTotal + $newTotal;
                     $ledger->save();
                 }
             }
@@ -267,9 +279,10 @@ class LotSaleController extends Controller
 
         return back()->with(
             'success',
-            "Sale updated (+{$addUnits} units), stock adjusted, and ledger updated if applicable."
+            "Sale updated. Stock & ledger adjusted successfully."
         );
     }
+
 
 
     public function deleteSale(Request $request)
@@ -570,26 +583,33 @@ class LotSaleController extends Controller
                 $sales = DB::table('lot_sales')->where('lot_id', $lot->id)->get();
 
                 $totalSale = $sales->sum(function ($sale) {
-                    return $sale->quantity * $sale->price;
+                    // 👇 Use weight if it's not null and greater than 0
+                    return ($sale->weight !== null && $sale->weight > 0)
+                        ? $sale->weight * $sale->price
+                        : $sale->quantity * $sale->price;
                 });
 
-                $averageSale = $lot->total_units > 0 ? $totalSale / $lot->total_units : 0;
+                $totalUnitsSold = $sales->sum('quantity');
+                $totalWeight = $sales->sum('weight');
 
-                $totalWeight = $sales->sum('weight'); // 👈 Add this line
+                // 👇 Average based on quantity if available, otherwise weight
+                $averageSale = $totalUnitsSold > 0
+                    ? $totalSale / $totalUnitsSold
+                    : ($totalWeight > 0 ? $totalSale / $totalWeight : 0);
 
                 $lot->total_sale = $totalSale;
                 $lot->average_sale = $averageSale;
-                $lot->total_weight = $totalWeight; // 👈 Attach weight
+                $lot->total_weight = $totalWeight;
 
                 return $lot;
             });
 
         $truck = DB::table('truck_entries')->where('id', $truck_id)->first();
         $customers = Customer::orderBy('customer_name', 'asc')->get();
-        $vendor_id = $vendor_id;
 
         return view('admin_panel.lot_sale.create_bill', compact('lots', 'truck', 'customers', 'vendor_id'));
     }
+
 
 
     public function store_Bill(Request $request)
@@ -662,6 +682,7 @@ class LotSaleController extends Controller
         $netPayToVendor = $request->input('net_pay');
         // ✅ Save Bill
         $bill = new VendorBill();
+        $bill->bill_date = $request->date;
         $bill->truck_id = $request->truck_id;
         $bill->trucknumber = $request->trucknumber;
         $bill->vendorId = $request->vendorId;

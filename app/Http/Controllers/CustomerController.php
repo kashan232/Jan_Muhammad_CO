@@ -206,7 +206,10 @@ class CustomerController extends Controller
     {
         if (Auth::id()) {
             $userId = Auth::id();
-            $Recoveries = CustomerRecovery::where('admin_or_user_id', $userId)->with('customer')->get();
+            $Recoveries = CustomerRecovery::where('admin_or_user_id', $userId)
+                ->with('customer')
+                ->orderBy('id', 'desc') // Optional: show latest first
+                ->paginate(100); // 👈 Paginate with 100 per page
             return view('admin_panel.customers.customers_recoveries', compact('Recoveries'));
         } else {
             return redirect()->back();
@@ -263,5 +266,34 @@ class CustomerController extends Controller
             ->first();
 
         return response()->json($lotSale);
+    }
+
+    public function deleteRecovery(Request $request)
+    {
+        $request->validate([
+            'recovery_id' => 'required|integer',
+            'customer_id' => 'required|integer',
+            'amount' => 'required|numeric'
+        ]);
+
+        // Find recovery record
+        $recovery = DB::table('customer_recoveries')->where('id', $request->recovery_id)->first();
+
+        if (!$recovery) {
+            return response()->json(['message' => 'Recovery not found.'], 404);
+        }
+
+        // Permanently delete the recovery
+        DB::table('customer_recoveries')->where('id', $request->recovery_id)->delete();
+
+        // Update closing_balance in customer_ledgers by adding back the amount
+        DB::table('customer_ledgers')
+            ->where('customer_id', $request->customer_id)
+            ->update([
+                'closing_balance' => DB::raw("closing_balance + {$request->amount}"),
+                'updated_at' => now()
+            ]);
+
+        return response()->json(['message' => 'Recovery permanently deleted and balance updated.']);
     }
 }

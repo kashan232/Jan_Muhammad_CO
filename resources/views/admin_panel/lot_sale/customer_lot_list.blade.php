@@ -23,7 +23,7 @@
 
         .invoice-box {
             page-break-inside: avoid;
-            padding: 10mm !important;
+            padding: 1mm !important;
             border: 1px solid #000;
         }
 
@@ -199,7 +199,7 @@
             <span style="font-weight: bold;">03223014221</span>
             <span style="font-weight: bold;">03213022033</span>
         </div>
-        <img src="logo-bill.png" alt="Logo" style="max-height: 100px;">
+        <img src="logo-bill.png" alt="Logo" style="max-height: 75px;">
         <div class="d-flex flex-column text-end">
             <span style="font-weight: bold;">03213061917</span>
             <span style="font-weight: bold;">03118661606</span>

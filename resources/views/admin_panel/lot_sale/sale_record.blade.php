@@ -104,7 +104,14 @@
                                                                         <input type="number" class="form-control"
                                                                             value="{{ $sale->quantity }}" readonly>
                                                                     </div>
-
+                                                                    <!-- Conditional Weight Field -->
+                                                                    @if($sale->weight !== null)
+                                                                    <div class="mb-3">
+                                                                        <label for="weight" class="form-label">Weight (KG)</label>
+                                                                        <input type="number" step="0.01" name="weight" class="form-control" value="{{ $sale->weight }}">
+                                                                        <div class="form-text">Optional: Only applicable if weight-based sale.</div>
+                                                                    </div>
+                                                                    @endif
                                                                     <!-- NEW: Add Units -->
                                                                     <div class="mb-3">
                                                                         <label for="add_units" class="form-label">Add Units</label>
